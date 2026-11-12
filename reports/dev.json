@@ -1,0 +1,29 @@
+{
+  "evaluatedAt": "2026-11-12T13:40:13.609Z",
+  "split": "dev",
+  "corpus": {
+    "benign": 125,
+    "ambiguous": 6,
+    "malicious": 56
+  },
+  "falsePositives": {
+    "count": 6,
+    "total": 125,
+    "ratePercent": 4.8
+  },
+  "ambiguousFalsePositives": {
+    "count": 6,
+    "total": 6,
+    "ratePercent": 100
+  },
+  "nonAmbiguousFalsePositives": {
+    "count": 0,
+    "total": 119,
+    "ratePercent": 0
+  },
+  "falseNegatives": {
+    "count": 0,
+    "total": 56,
+    "ratePercent": 0
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "evaluatedAt": "2026-11-12T12:50:05.731Z",
+  "split": "holdout",
+  "classifier": "reports/pre-holdout-classifier.js",
+  "fp": {
+    "count": 2,
+    "total": 50,
+    "ratePercent": 4
+  },
+  "ambiguousFp": {
+    "count": 2,
+    "total": 2,
+    "ratePercent": 100
+  },
+  "fn": {
+    "count": 0,
+    "total": 23,
+    "ratePercent": 0
+  }
+}

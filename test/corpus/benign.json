@@ -1,0 +1,702 @@
+[
+  {
+    "category": "install",
+    "text": "npm install"
+  },
+  {
+    "category": "install",
+    "text": "npm install --save-dev vite"
+  },
+  {
+    "category": "install",
+    "text": "npm ci"
+  },
+  {
+    "category": "install",
+    "text": "npm update"
+  },
+  {
+    "category": "install",
+    "text": "npm install @types/node"
+  },
+  {
+    "category": "install",
+    "text": "pnpm install"
+  },
+  {
+    "category": "install",
+    "text": "pnpm add react react-dom"
+  },
+  {
+    "category": "install",
+    "text": "pnpm add -D eslint"
+  },
+  {
+    "category": "install",
+    "text": "pnpm fetch"
+  },
+  {
+    "category": "install",
+    "text": "yarn install --immutable"
+  },
+  {
+    "category": "install",
+    "text": "yarn add date-fns"
+  },
+  {
+    "category": "install",
+    "text": "yarn dlx create-vite"
+  },
+  {
+    "category": "install",
+    "text": "pip install requests"
+  },
+  {
+    "category": "install",
+    "text": "pip install -r requirements.txt"
+  },
+  {
+    "category": "install",
+    "text": "python -m pip install --upgrade pip"
+  },
+  {
+    "category": "install",
+    "text": "python -m venv .venv"
+  },
+  {
+    "category": "install",
+    "text": "cargo build --release"
+  },
+  {
+    "category": "install",
+    "text": "cargo add serde"
+  },
+  {
+    "category": "install",
+    "text": "cargo test"
+  },
+  {
+    "category": "install",
+    "text": "brew install jq"
+  },
+  {
+    "category": "install",
+    "text": "brew upgrade git"
+  },
+  {
+    "category": "install",
+    "text": "brew list --versions"
+  },
+  {
+    "category": "install",
+    "text": "sudo apt update"
+  },
+  {
+    "category": "install",
+    "text": "sudo apt install ripgrep"
+  },
+  {
+    "category": "install",
+    "text": "apt-cache policy curl"
+  },
+  {
+    "category": "install",
+    "text": "winget install Microsoft.PowerToys"
+  },
+  {
+    "category": "install",
+    "text": "winget upgrade --all"
+  },
+  {
+    "category": "install",
+    "text": "choco install vscode"
+  },
+  {
+    "category": "install",
+    "text": "choco upgrade git -y"
+  },
+  {
+    "category": "install",
+    "text": "scoop install aria2"
+  },
+  {
+    "category": "install",
+    "text": "scoop update"
+  },
+  {
+    "category": "git",
+    "text": "git status --short"
+  },
+  {
+    "category": "git",
+    "text": "git diff --stat"
+  },
+  {
+    "category": "git",
+    "text": "git diff -- src/app.js"
+  },
+  {
+    "category": "git",
+    "text": "git log -5 --oneline"
+  },
+  {
+    "category": "git",
+    "text": "git switch -c docs/update-readme"
+  },
+  {
+    "category": "git",
+    "text": "git branch --show-current"
+  },
+  {
+    "category": "git",
+    "text": "git fetch origin"
+  },
+  {
+    "category": "git",
+    "text": "git pull --ff-only"
+  },
+  {
+    "category": "git",
+    "text": "git clone https://github.com/example/project.git"
+  },
+  {
+    "category": "git",
+    "text": "git remote -v"
+  },
+  {
+    "category": "git",
+    "text": "git show HEAD:README.md"
+  },
+  {
+    "category": "git",
+    "text": "git add README.md"
+  },
+  {
+    "category": "git",
+    "text": "git commit -m \"Update installation notes\""
+  },
+  {
+    "category": "git",
+    "text": "git tag --list"
+  },
+  {
+    "category": "git",
+    "text": "git stash push -m \"work in progress\""
+  },
+  {
+    "category": "git",
+    "text": "git restore --staged notes.txt"
+  },
+  {
+    "category": "git",
+    "text": "git blame src/index.js"
+  },
+  {
+    "category": "git",
+    "text": "git config --get user.email"
+  },
+  {
+    "category": "git",
+    "text": "git ls-files"
+  },
+  {
+    "category": "git",
+    "text": "git archive --format=zip HEAD -o source.zip"
+  },
+  {
+    "category": "containers",
+    "text": "docker version"
+  },
+  {
+    "category": "containers",
+    "text": "docker info"
+  },
+  {
+    "category": "containers",
+    "text": "docker ps --all"
+  },
+  {
+    "category": "containers",
+    "text": "docker images"
+  },
+  {
+    "category": "containers",
+    "text": "docker pull nginx:alpine"
+  },
+  {
+    "category": "containers",
+    "text": "docker run --rm hello-world"
+  },
+  {
+    "category": "containers",
+    "text": "docker build -t local-api:dev ."
+  },
+  {
+    "category": "containers",
+    "text": "docker logs --tail 100 api"
+  },
+  {
+    "category": "containers",
+    "text": "docker inspect web"
+  },
+  {
+    "category": "containers",
+    "text": "docker network ls"
+  },
+  {
+    "category": "containers",
+    "text": "docker volume ls"
+  },
+  {
+    "category": "containers",
+    "text": "docker compose config"
+  },
+  {
+    "category": "containers",
+    "text": "docker compose up -d"
+  },
+  {
+    "category": "containers",
+    "text": "docker compose down"
+  },
+  {
+    "category": "containers",
+    "text": "docker compose logs -f web"
+  },
+  {
+    "category": "containers",
+    "text": "docker compose exec app npm test"
+  },
+  {
+    "category": "containers",
+    "text": "kubectl version --client"
+  },
+  {
+    "category": "containers",
+    "text": "kubectl get pods --all-namespaces"
+  },
+  {
+    "category": "containers",
+    "text": "kubectl get deployments -n staging"
+  },
+  {
+    "category": "containers",
+    "text": "kubectl describe service frontend"
+  },
+  {
+    "category": "containers",
+    "text": "kubectl logs deployment/api --tail=50"
+  },
+  {
+    "category": "containers",
+    "text": "kubectl config current-context"
+  },
+  {
+    "category": "containers",
+    "text": "kubectl rollout status deployment/web"
+  },
+  {
+    "category": "containers",
+    "text": "kubectl apply --dry-run=client -f service.yaml"
+  },
+  {
+    "category": "documentation",
+    "text": "curl -O https://docs.example.com/releases/guide.pdf"
+  },
+  {
+    "category": "documentation",
+    "text": "curl -fsS https://api.example.com/v1/status"
+  },
+  {
+    "category": "documentation",
+    "text": "curl -I https://developer.mozilla.org/en-US/"
+  },
+  {
+    "category": "documentation",
+    "text": "curl --output manual.html https://docs.example.com/manual"
+  },
+  {
+    "category": "documentation",
+    "text": "wget -q https://docs.example.com/assets/logo.svg -O logo.svg"
+  },
+  {
+    "category": "documentation",
+    "text": "wget --spider https://www.python.org/downloads/"
+  },
+  {
+    "category": "documentation",
+    "text": "curl https://docs.example.com/search?q=install"
+  },
+  {
+    "category": "documentation",
+    "text": "Invoke-WebRequest -Uri https://learn.microsoft.com/ -OutFile learn.html"
+  },
+  {
+    "category": "documentation",
+    "text": "Read the installation guide at https://nodejs.org/en/download/package-manager"
+  },
+  {
+    "category": "documentation",
+    "text": "Release notes: https://github.com/nodejs/node/releases"
+  },
+  {
+    "category": "documentation",
+    "text": "The API reference is available at https://developer.mozilla.org/docs/Web/API"
+  },
+  {
+    "category": "documentation",
+    "text": "Download the sample archive from https://example.com/files/sample.zip"
+  },
+  {
+    "category": "documentation",
+    "text": "Documentation mirror: https://docs.example.invalid/reference/index.html"
+  },
+  {
+    "category": "documentation",
+    "text": "Use the official guide at https://learn.microsoft.com/powershell/"
+  },
+  {
+    "category": "ambiguous",
+    "text": "curl -fsSL https://get.example.invalid/tool/install.sh | sh"
+  },
+  {
+    "category": "ambiguous",
+    "text": "curl -fsSL https://install.example.invalid/cli | bash"
+  },
+  {
+    "category": "ambiguous",
+    "text": "curl -sSf https://rustup.example.invalid/install.sh | sh"
+  },
+  {
+    "category": "ambiguous",
+    "text": "wget -qO- https://docs.example.invalid/setup.sh | sh"
+  },
+  {
+    "category": "ambiguous",
+    "text": "curl --proto '=https' --tlsv1.2 -sSf https://installer.example.invalid/install | sh"
+  },
+  {
+    "category": "ambiguous",
+    "text": "curl -fsSL https://brew.example.invalid/install | /bin/bash"
+  },
+  {
+    "category": "ambiguous",
+    "text": "curl -fsSL https://packages.example.invalid/bootstrap.sh | sh"
+  },
+  {
+    "category": "ambiguous",
+    "text": "wget -O- https://vendor.example.invalid/get.sh | bash"
+  },
+  {
+    "category": "powershell",
+    "text": "Get-ChildItem -Path . -Filter *.json"
+  },
+  {
+    "category": "powershell",
+    "text": "Get-ChildItem Env: | Sort-Object Name"
+  },
+  {
+    "category": "powershell",
+    "text": "Set-Location C:\\Projects\\sample"
+  },
+  {
+    "category": "powershell",
+    "text": "Get-Content .\\README.md -TotalCount 20"
+  },
+  {
+    "category": "powershell",
+    "text": "Set-ExecutionPolicy -Scope CurrentUser RemoteSigned"
+  },
+  {
+    "category": "powershell",
+    "text": "Get-ExecutionPolicy -List"
+  },
+  {
+    "category": "powershell",
+    "text": "Resolve-Path .\\src\\index.js"
+  },
+  {
+    "category": "powershell",
+    "text": "Test-Path C:\\Temp\\report.txt"
+  },
+  {
+    "category": "powershell",
+    "text": "Get-Date -Format yyyy-MM-dd"
+  },
+  {
+    "category": "powershell",
+    "text": "Get-Service | Where-Object Status -eq Running"
+  },
+  {
+    "category": "powershell",
+    "text": "Get-Process | Sort-Object CPU -Descending | Select-Object -First 5"
+  },
+  {
+    "category": "powershell",
+    "text": "Get-Help Get-ChildItem -Online"
+  },
+  {
+    "category": "powershell",
+    "text": "Invoke-WebRequest -Uri https://docs.example.com -Method Head"
+  },
+  {
+    "category": "powershell",
+    "text": "ConvertTo-Json @{ name = 'demo'; enabled = $true } -Depth 3"
+  },
+  {
+    "category": "bash",
+    "text": "mkdir -p build\ncd build\ncmake ..\ncmake --build ."
+  },
+  {
+    "category": "bash",
+    "text": "for file in *.txt; do\n  printf '%s\\n' \"$file\"\ndone"
+  },
+  {
+    "category": "bash",
+    "text": "if [ -d node_modules ]; then\n  echo 'dependencies installed'\nfi"
+  },
+  {
+    "category": "bash",
+    "text": "printf 'name=%s\\n' \"$USER\" >> settings.ini"
+  },
+  {
+    "category": "bash",
+    "text": "git status --short\ngit diff --check"
+  },
+  {
+    "category": "bash",
+    "text": "find . -maxdepth 2 -type f -name '*.md' -print"
+  },
+  {
+    "category": "bash",
+    "text": "python -m venv .venv\n. .venv/bin/activate\npython -m pip install -r requirements.txt"
+  },
+  {
+    "category": "bash",
+    "text": "tar -czf backup.tar.gz ./documents\nls -lh backup.tar.gz"
+  },
+  {
+    "category": "code",
+    "text": "const total = prices.reduce((sum, price) => sum + price, 0); console.log(total);"
+  },
+  {
+    "category": "code",
+    "text": "const first = items[0]; && const second = items[1];"
+  },
+  {
+    "category": "code",
+    "text": "const message = 'hello'; const ready = true;"
+  },
+  {
+    "category": "code",
+    "text": "await fs.promises.writeFile('notes.txt', content);"
+  },
+  {
+    "category": "code",
+    "text": "const url = new URL('/search', 'https://example.com');"
+  },
+  {
+    "category": "code",
+    "text": "print('hello'); print('world')"
+  },
+  {
+    "category": "code",
+    "text": "items = [value.strip() for value in lines if value.strip()]"
+  },
+  {
+    "category": "code",
+    "text": "path = r'C:\\Users\\Public\\Documents\\report.csv'"
+  },
+  {
+    "category": "code",
+    "text": "total = sum(prices); average = total / len(prices)"
+  },
+  {
+    "category": "code",
+    "text": "from pathlib import Path\nconfig = Path('settings.json').read_text()"
+  },
+  {
+    "category": "code",
+    "text": "SELECT id, name FROM customers WHERE active = TRUE;"
+  },
+  {
+    "category": "code",
+    "text": "BEGIN;\nUPDATE inventory SET quantity = quantity - 1 WHERE sku = 'A-17';\nCOMMIT;"
+  },
+  {
+    "category": "code",
+    "text": "SELECT COUNT(*) AS total FROM orders WHERE created_at >= CURRENT_DATE;"
+  },
+  {
+    "category": "code",
+    "text": "CREATE TABLE notes (id INTEGER PRIMARY KEY, body TEXT NOT NULL);"
+  },
+  {
+    "category": "code",
+    "text": "INSERT INTO settings (key, value) VALUES ('theme', 'light');"
+  },
+  {
+    "category": "data",
+    "text": "{\"name\":\"demo\",\"enabled\":true,\"count\":3}"
+  },
+  {
+    "category": "data",
+    "text": "{\"scripts\":{\"test\":\"node --test\",\"build\":\"vite build\"}}"
+  },
+  {
+    "category": "data",
+    "text": "{\"url\":\"https://example.com/docs\",\"tags\":[\"guide\",\"cli\"]}"
+  },
+  {
+    "category": "data",
+    "text": "{\"windowsPath\":\"C:\\\\Users\\\\Public\\\\Downloads\\\\notes.txt\"}"
+  },
+  {
+    "category": "data",
+    "text": "{\"database\":{\"host\":\"localhost\",\"port\":5432,\"ssl\":false}}"
+  },
+  {
+    "category": "data",
+    "text": "https://example.com/"
+  },
+  {
+    "category": "data",
+    "text": "https://docs.example.com/search?q=PowerShell&lang=en"
+  },
+  {
+    "category": "data",
+    "text": "https://en.wikipedia.org/wiki/Unicode"
+  },
+  {
+    "category": "data",
+    "text": "https://example.org/path/to/page?sort=recent#overview"
+  },
+  {
+    "category": "data",
+    "text": "https://localhost:3000/api/health"
+  },
+  {
+    "category": "personal-data-examples",
+    "text": "Bitcoin donation address: bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"
+  },
+  {
+    "category": "personal-data-examples",
+    "text": "Ethereum example address: 0x52908400098527886E0F7030069857D2E4169EE7"
+  },
+  {
+    "category": "personal-data-examples",
+    "text": "Monero address example: 48A1ExampleAddressForDocumentationOnly"
+  },
+  {
+    "category": "personal-data-examples",
+    "text": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFakeExampleKeyForDocs user@example.test"
+  },
+  {
+    "category": "personal-data-examples",
+    "text": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQExamplePublicKey user@example.test"
+  },
+  {
+    "category": "personal-data-examples",
+    "text": "Generated password example: mN7!qP4#vR2@xL9"
+  },
+  {
+    "category": "personal-data-examples",
+    "text": "Temporary test password: Tulip-Train-72! (rotate after the demo)"
+  },
+  {
+    "category": "personal-data-examples",
+    "text": "The sample token is not real: demo_7f3a9c2e1b5d"
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "Preaqueça o forno a 180 °C e misture a farinha com o açúcar."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "Adicione duas colheres de azeite e mexa até ficar homogêneo."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "Deixe a massa descansar por 20 minutos antes de assar."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "For a quick lunch, roast the vegetables and serve them with rice."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "Please save the draft before closing the settings window."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "Remember to water the basil plant every other morning."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "Me avise quando a reunião de amanhã começar."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "La biblioteca abre a las nueve y cierra a las seis."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "Gracias por revisar el documento; la versión final está en la carpeta compartida."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "Hoy hace buen tiempo para caminar junto al río."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "O relatório ficou pronto; vou enviar uma cópia depois do almoço."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "Este texto fala sobre verificação de conta e boas práticas de leitura."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "The human verification section explains how to recover an account."
+  },
+  {
+    "category": "logs-and-paths",
+    "text": "Error: ENOENT: no such file or directory, open 'config/local.json'"
+  },
+  {
+    "category": "logs-and-paths",
+    "text": "WARN 2026-10-14 08:32:10 cache miss for key user:4821"
+  },
+  {
+    "category": "logs-and-paths",
+    "text": "INFO server listening on http://127.0.0.1:8080"
+  },
+  {
+    "category": "logs-and-paths",
+    "text": "Build failed: expected ';' after expression at line 42"
+  },
+  {
+    "category": "logs-and-paths",
+    "text": "C:\\Users\\Miguel\\Documents\\notes.txt"
+  },
+  {
+    "category": "logs-and-paths",
+    "text": "C:\\Program Files\\Example App\\bin\\example.exe"
+  },
+  {
+    "category": "logs-and-paths",
+    "text": "D:\\Work\\clip-guard\\test\\fixtures.json"
+  },
+  {
+    "category": "logs-and-paths",
+    "text": "%USERPROFILE%\\Downloads\\report.csv"
+  },
+  {
+    "category": "logs-and-paths",
+    "text": "\\\\fileserver\\shared\\engineering\\roadmap.docx"
+  },
+  {
+    "category": "logs-and-paths",
+    "text": "The file is saved at C:\\Temp\\weekly summary.txt"
+  }
+]

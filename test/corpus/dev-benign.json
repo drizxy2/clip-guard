@@ -1,0 +1,502 @@
+[
+  {
+    "category": "ambiguous",
+    "text": "curl --proto '=https' --tlsv1.2 -sSf https://installer.example.invalid/install | sh"
+  },
+  {
+    "category": "ambiguous",
+    "text": "curl -fsSL https://get.example.invalid/tool/install.sh | sh"
+  },
+  {
+    "category": "ambiguous",
+    "text": "curl -sSf https://rustup.example.invalid/install.sh | sh"
+  },
+  {
+    "category": "ambiguous",
+    "text": "curl -fsSL https://packages.example.invalid/bootstrap.sh | sh"
+  },
+  {
+    "category": "ambiguous",
+    "text": "curl -fsSL https://brew.example.invalid/install | /bin/bash"
+  },
+  {
+    "category": "ambiguous",
+    "text": "wget -qO- https://docs.example.invalid/setup.sh | sh"
+  },
+  {
+    "category": "bash",
+    "text": "mkdir -p build\ncd build\ncmake ..\ncmake --build ."
+  },
+  {
+    "category": "bash",
+    "text": "printf 'name=%s\\n' \"$USER\" >> settings.ini"
+  },
+  {
+    "category": "bash",
+    "text": "find . -maxdepth 2 -type f -name '*.md' -print"
+  },
+  {
+    "category": "bash",
+    "text": "tar -czf backup.tar.gz ./documents\nls -lh backup.tar.gz"
+  },
+  {
+    "category": "bash",
+    "text": "if [ -d node_modules ]; then\n  echo 'dependencies installed'\nfi"
+  },
+  {
+    "category": "bash",
+    "text": "python -m venv .venv\n. .venv/bin/activate\npython -m pip install -r requirements.txt"
+  },
+  {
+    "category": "code",
+    "text": "items = [value.strip() for value in lines if value.strip()]"
+  },
+  {
+    "category": "code",
+    "text": "const message = 'hello'; const ready = true;"
+  },
+  {
+    "category": "code",
+    "text": "print('hello'); print('world')"
+  },
+  {
+    "category": "code",
+    "text": "CREATE TABLE notes (id INTEGER PRIMARY KEY, body TEXT NOT NULL);"
+  },
+  {
+    "category": "code",
+    "text": "await fs.promises.writeFile('notes.txt', content);"
+  },
+  {
+    "category": "code",
+    "text": "total = sum(prices); average = total / len(prices)"
+  },
+  {
+    "category": "code",
+    "text": "BEGIN;\nUPDATE inventory SET quantity = quantity - 1 WHERE sku = 'A-17';\nCOMMIT;"
+  },
+  {
+    "category": "code",
+    "text": "INSERT INTO settings (key, value) VALUES ('theme', 'light');"
+  },
+  {
+    "category": "code",
+    "text": "const first = items[0]; && const second = items[1];"
+  },
+  {
+    "category": "code",
+    "text": "from pathlib import Path\nconfig = Path('settings.json').read_text()"
+  },
+  {
+    "category": "code",
+    "text": "const total = prices.reduce((sum, price) => sum + price, 0); console.log(total);"
+  },
+  {
+    "category": "containers",
+    "text": "kubectl get deployments -n staging"
+  },
+  {
+    "category": "containers",
+    "text": "kubectl logs deployment/api --tail=50"
+  },
+  {
+    "category": "containers",
+    "text": "docker logs --tail 100 api"
+  },
+  {
+    "category": "containers",
+    "text": "docker compose down"
+  },
+  {
+    "category": "containers",
+    "text": "docker ps --all"
+  },
+  {
+    "category": "containers",
+    "text": "kubectl version --client"
+  },
+  {
+    "category": "containers",
+    "text": "docker compose config"
+  },
+  {
+    "category": "containers",
+    "text": "docker pull nginx:alpine"
+  },
+  {
+    "category": "containers",
+    "text": "docker compose exec app npm test"
+  },
+  {
+    "category": "containers",
+    "text": "docker build -t local-api:dev ."
+  },
+  {
+    "category": "containers",
+    "text": "docker compose up -d"
+  },
+  {
+    "category": "containers",
+    "text": "docker info"
+  },
+  {
+    "category": "containers",
+    "text": "kubectl config current-context"
+  },
+  {
+    "category": "containers",
+    "text": "kubectl rollout status deployment/web"
+  },
+  {
+    "category": "containers",
+    "text": "docker network ls"
+  },
+  {
+    "category": "containers",
+    "text": "docker volume ls"
+  },
+  {
+    "category": "containers",
+    "text": "kubectl describe service frontend"
+  },
+  {
+    "category": "data",
+    "text": "https://example.org/path/to/page?sort=recent#overview"
+  },
+  {
+    "category": "data",
+    "text": "https://example.com/"
+  },
+  {
+    "category": "data",
+    "text": "https://en.wikipedia.org/wiki/Unicode"
+  },
+  {
+    "category": "data",
+    "text": "https://localhost:3000/api/health"
+  },
+  {
+    "category": "data",
+    "text": "{\"url\":\"https://example.com/docs\",\"tags\":[\"guide\",\"cli\"]}"
+  },
+  {
+    "category": "data",
+    "text": "{\"windowsPath\":\"C:\\\\Users\\\\Public\\\\Downloads\\\\notes.txt\"}"
+  },
+  {
+    "category": "data",
+    "text": "https://docs.example.com/search?q=PowerShell&lang=en"
+  },
+  {
+    "category": "documentation",
+    "text": "Documentation mirror: https://docs.example.invalid/reference/index.html"
+  },
+  {
+    "category": "documentation",
+    "text": "Read the installation guide at https://nodejs.org/en/download/package-manager"
+  },
+  {
+    "category": "documentation",
+    "text": "wget --spider https://www.python.org/downloads/"
+  },
+  {
+    "category": "documentation",
+    "text": "Use the official guide at https://learn.microsoft.com/powershell/"
+  },
+  {
+    "category": "documentation",
+    "text": "The API reference is available at https://developer.mozilla.org/docs/Web/API"
+  },
+  {
+    "category": "documentation",
+    "text": "curl -fsS https://api.example.com/v1/status"
+  },
+  {
+    "category": "documentation",
+    "text": "Download the sample archive from https://example.com/files/sample.zip"
+  },
+  {
+    "category": "documentation",
+    "text": "Invoke-WebRequest -Uri https://learn.microsoft.com/ -OutFile learn.html"
+  },
+  {
+    "category": "documentation",
+    "text": "curl --output manual.html https://docs.example.com/manual"
+  },
+  {
+    "category": "documentation",
+    "text": "curl -O https://docs.example.com/releases/guide.pdf"
+  },
+  {
+    "category": "git",
+    "text": "git archive --format=zip HEAD -o source.zip"
+  },
+  {
+    "category": "git",
+    "text": "git blame src/index.js"
+  },
+  {
+    "category": "git",
+    "text": "git clone https://github.com/example/project.git"
+  },
+  {
+    "category": "git",
+    "text": "git remote -v"
+  },
+  {
+    "category": "git",
+    "text": "git diff --stat"
+  },
+  {
+    "category": "git",
+    "text": "git fetch origin"
+  },
+  {
+    "category": "git",
+    "text": "git restore --staged notes.txt"
+  },
+  {
+    "category": "git",
+    "text": "git commit -m \"Update installation notes\""
+  },
+  {
+    "category": "git",
+    "text": "git log -5 --oneline"
+  },
+  {
+    "category": "git",
+    "text": "git stash push -m \"work in progress\""
+  },
+  {
+    "category": "git",
+    "text": "git tag --list"
+  },
+  {
+    "category": "git",
+    "text": "git switch -c docs/update-readme"
+  },
+  {
+    "category": "git",
+    "text": "git show HEAD:README.md"
+  },
+  {
+    "category": "git",
+    "text": "git ls-files"
+  },
+  {
+    "category": "install",
+    "text": "winget install Microsoft.PowerToys"
+  },
+  {
+    "category": "install",
+    "text": "sudo apt update"
+  },
+  {
+    "category": "install",
+    "text": "yarn dlx create-vite"
+  },
+  {
+    "category": "install",
+    "text": "apt-cache policy curl"
+  },
+  {
+    "category": "install",
+    "text": "cargo test"
+  },
+  {
+    "category": "install",
+    "text": "python -m pip install --upgrade pip"
+  },
+  {
+    "category": "install",
+    "text": "npm install"
+  },
+  {
+    "category": "install",
+    "text": "pip install -r requirements.txt"
+  },
+  {
+    "category": "install",
+    "text": "python -m venv .venv"
+  },
+  {
+    "category": "install",
+    "text": "npm update"
+  },
+  {
+    "category": "install",
+    "text": "choco upgrade git -y"
+  },
+  {
+    "category": "install",
+    "text": "pip install requests"
+  },
+  {
+    "category": "install",
+    "text": "pnpm add -D eslint"
+  },
+  {
+    "category": "install",
+    "text": "cargo build --release"
+  },
+  {
+    "category": "install",
+    "text": "scoop install aria2"
+  },
+  {
+    "category": "install",
+    "text": "npm install --save-dev vite"
+  },
+  {
+    "category": "install",
+    "text": "brew install jq"
+  },
+  {
+    "category": "install",
+    "text": "npm ci"
+  },
+  {
+    "category": "install",
+    "text": "cargo add serde"
+  },
+  {
+    "category": "install",
+    "text": "pnpm add react react-dom"
+  },
+  {
+    "category": "install",
+    "text": "scoop update"
+  },
+  {
+    "category": "install",
+    "text": "yarn add date-fns"
+  },
+  {
+    "category": "logs-and-paths",
+    "text": "The file is saved at C:\\Temp\\weekly summary.txt"
+  },
+  {
+    "category": "logs-and-paths",
+    "text": "%USERPROFILE%\\Downloads\\report.csv"
+  },
+  {
+    "category": "logs-and-paths",
+    "text": "\\\\fileserver\\shared\\engineering\\roadmap.docx"
+  },
+  {
+    "category": "logs-and-paths",
+    "text": "C:\\Program Files\\Example App\\bin\\example.exe"
+  },
+  {
+    "category": "logs-and-paths",
+    "text": "C:\\Users\\Miguel\\Documents\\notes.txt"
+  },
+  {
+    "category": "logs-and-paths",
+    "text": "Error: ENOENT: no such file or directory, open 'config/local.json'"
+  },
+  {
+    "category": "logs-and-paths",
+    "text": "Build failed: expected ';' after expression at line 42"
+  },
+  {
+    "category": "personal-data-examples",
+    "text": "The sample token is not real: demo_7f3a9c2e1b5d"
+  },
+  {
+    "category": "personal-data-examples",
+    "text": "Ethereum example address: 0x52908400098527886E0F7030069857D2E4169EE7"
+  },
+  {
+    "category": "personal-data-examples",
+    "text": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQExamplePublicKey user@example.test"
+  },
+  {
+    "category": "personal-data-examples",
+    "text": "Temporary test password: Tulip-Train-72! (rotate after the demo)"
+  },
+  {
+    "category": "personal-data-examples",
+    "text": "Monero address example: 48A1ExampleAddressForDocumentationOnly"
+  },
+  {
+    "category": "personal-data-examples",
+    "text": "Generated password example: mN7!qP4#vR2@xL9"
+  },
+  {
+    "category": "powershell",
+    "text": "Get-Date -Format yyyy-MM-dd"
+  },
+  {
+    "category": "powershell",
+    "text": "Get-Process | Sort-Object CPU -Descending | Select-Object -First 5"
+  },
+  {
+    "category": "powershell",
+    "text": "Set-ExecutionPolicy -Scope CurrentUser RemoteSigned"
+  },
+  {
+    "category": "powershell",
+    "text": "Resolve-Path .\\src\\index.js"
+  },
+  {
+    "category": "powershell",
+    "text": "Get-ExecutionPolicy -List"
+  },
+  {
+    "category": "powershell",
+    "text": "Get-Content .\\README.md -TotalCount 20"
+  },
+  {
+    "category": "powershell",
+    "text": "Get-Service | Where-Object Status -eq Running"
+  },
+  {
+    "category": "powershell",
+    "text": "ConvertTo-Json @{ name = 'demo'; enabled = $true } -Depth 3"
+  },
+  {
+    "category": "powershell",
+    "text": "Invoke-WebRequest -Uri https://docs.example.com -Method Head"
+  },
+  {
+    "category": "powershell",
+    "text": "Test-Path C:\\Temp\\report.txt"
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "O relatório ficou pronto; vou enviar uma cópia depois do almoço."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "Please save the draft before closing the settings window."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "Gracias por revisar el documento; la versión final está en la carpeta compartida."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "Me avise quando a reunião de amanhã começar."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "Hoy hace buen tiempo para caminar junto al río."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "Este texto fala sobre verificação de conta e boas práticas de leitura."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "The human verification section explains how to recover an account."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "Adicione duas colheres de azeite e mexa até ficar homogêneo."
+  },
+  {
+    "category": "recipes-and-text",
+    "text": "Remember to water the basil plant every other morning."
+  }
+]

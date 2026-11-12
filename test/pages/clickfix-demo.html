@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clip Guard - demonstração inofensiva</title>
+  <style>
+    body { max-width: 720px; margin: 48px auto; padding: 0 20px; font: 16px/1.5 system-ui, sans-serif; }
+    button, input { margin: 8px 8px 8px 0; padding: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Demonstração local do Clip Guard</h1>
+  <p>O comando de demonstração apenas imprime texto no console do sistema. Não o execute.</p>
+  <button id="fake-check">Não sou um robô</button>
+  <button id="copy-legitimate">Copiar comando legítimo</button>
+  <p id="status" aria-live="polite"></p>
+  <label for="paste-target">Campo de teste de colagem:</label>
+  <input id="paste-target" type="text" size="60" placeholder="Use Ctrl+V aqui">
+  <script>
+    const status = document.querySelector("#status");
+    document.querySelector("#fake-check").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText("cmd /c echo test && calc");
+        status.textContent = "Texto de demonstração copiado. Não cole nem execute fora desta página.";
+      } catch {
+        status.textContent = "A escrita foi bloqueada pelo navegador. Use uma origem segura para a demonstração.";
+      }
+    });
+    document.querySelector("#copy-legitimate").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText("npm install lodash");
+        status.textContent = "Comando legítimo copiado.";
+      } catch {
+        status.textContent = "A escrita foi bloqueada pelo navegador.";
+      }
+    });
+  </script>
+</body>
+</html>

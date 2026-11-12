@@ -1,0 +1,14 @@
+[
+  {
+    "text": "git status --short",
+    "source": "https://example.invalid/docs",
+    "category": "benign",
+    "notes": "Consulta local do estado do repositório."
+  },
+  {
+    "text": "npm install --dry-run",
+    "source": "https://example.invalid/docs",
+    "category": "benign",
+    "notes": "Simulação de instalação sem efetuar alterações."
+  }
+]

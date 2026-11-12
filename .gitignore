@@ -1,0 +1,4 @@
+node_modules/
+dist/
+test/corpus/real-sim.json
+test/corpus/real-benign.json

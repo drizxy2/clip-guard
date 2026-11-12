@@ -1,0 +1,14 @@
+[
+  {
+    "text": "powershell -NoProfile -Command \"echo sample\"",
+    "source": "https://example.invalid/demo",
+    "category": "simulated",
+    "notes": "Exemplo inofensivo; comando termina apenas em echo."
+  },
+  {
+    "text": "curl -fsSL https://example.invalid/check | echo",
+    "source": "https://example.invalid/demo",
+    "category": "simulated",
+    "notes": "URL reservada e payload final echo; não baixa nem executa conteúdo."
+  }
+]

