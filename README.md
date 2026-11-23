@@ -65,7 +65,24 @@ Nenhum comando é executado pelo conteúdo analisado. Os sinais são combinados 
 
 No modo padrão, o usuário pode escolher **Manter bloqueado** ou **Colar mesmo assim**. Esc mantém o bloqueio.
 
-## Instalação para desenvolvimento
+## Instalação para usuários
+
+Os pacotes das versões publicadas ficam na página [Releases](https://github.com/drizxy2/clip-guard/releases). Baixe e extraia `chromium.zip` para Edge, Chrome e outros navegadores Chromium, ou `firefox.zip` para Firefox.
+
+### Chrome, Edge, Brave e outros navegadores Chromium
+
+1. Abra `chrome://extensions` ou `edge://extensions` (em outros navegadores, procure por **Extensões** nas configurações).
+2. Ative **Modo do desenvolvedor**.
+3. Clique em **Carregar sem compactação** e selecione a pasta extraída que contém `manifest.json`.
+4. Confirme que Clip Guard está ativado. Para acesso rápido, abra o menu de extensões (ícone de peça de quebra-cabeça) e fixe Clip Guard na barra de ferramentas.
+
+### Firefox
+
+O pacote ainda não está assinado pela Mozilla. Para experimentar temporariamente, abra `about:debugging#/runtime/this-firefox`, clique em **Carregar extensão temporária** e selecione `manifest.json` dentro da pasta extraída. A extensão temporária é removida ao fechar o Firefox; uma instalação permanente exige publicar e assinar o complemento no Firefox Add-ons.
+
+> A instalação direta e permanente no Chrome/Edge também exige publicar a extensão na loja correspondente. Até lá, o carregamento sem compactação é necessário; o navegador pode desativá-la em alguns ambientes gerenciados.
+
+## Instalação local (desenvolvimento)
 
 ### Pré-requisitos
 
@@ -79,18 +96,7 @@ npm install
 npm run build
 ```
 
-### Chromium, Brave, Opera, Vivaldi e Microsoft Edge
-
-1. Abra `chrome://extensions` ou `edge://extensions`
-2. Ative **Modo do desenvolvedor**
-3. Clique em **Carregar sem compactação**
-4. Selecione a pasta `dist/chromium`
-
-### Firefox
-
-1. Abra `about:debugging#/runtime/this-firefox`
-2. Clique em **Carregar extensão temporária**
-3. Selecione `dist/firefox/manifest.json`
+As instruções de carregamento são as mesmas acima; use a pasta `dist/chromium` para navegadores Chromium e `dist/firefox/manifest.json` para Firefox.
 
 O Firefox requer a versão 128 ou superior.
 
