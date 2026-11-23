@@ -5,6 +5,10 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
+const locales = [
+  "en", "zh_CN", "hi", "es", "ar", "fr", "bn", "pt_BR", "id", "ur",
+  "ru", "de", "ja", "pcm", "ar_EG", "mr", "vi", "te", "sw", "ha"
+];
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -87,7 +91,7 @@ const bridge = (await readFile(path.join(root, "src", "bridge.js"), "utf8"))
   .replace(/^import\s+\{\s*createUI\s*\}\s+from\s+["'][^"']+["'];\s*/m, "");
 assert(!/^\s*import\s/m.test(bridge), "bridge ISOLATED contém import não compilado");
 const compiledUI = ui.replace(
-  /^import\s+\{\s*translateMethod,\s*translateReason\s*\}\s+from\s+["'][^"']+["'];\s*/m,
+  /^import\s+\{\s*isRightToLeft,\s*translateMethod,\s*translateReason\s*\}\s+from\s+["'][^"']+["'];\s*/m,
   ""
 );
 assert(!/^\s*import\s/m.test(compiledUI), "UI ISOLATED contém import não compilado");
@@ -155,7 +159,7 @@ for (const browser of targets) {
   await writeFile(path.join(output, "src", "hook-main.js"), `${classifier}\n${hook}`);
   await writeFile(path.join(output, "src", "bridge.js"), `${i18n}\n${compiledUI}\n${bridge}`);
 
-  for (const locale of ["en", "pt_BR", "es"]) {
+  for (const locale of locales) {
     const localeDirectory = path.join(output, "_locales", locale);
     await mkdir(localeDirectory, { recursive: true });
     await copyFile(

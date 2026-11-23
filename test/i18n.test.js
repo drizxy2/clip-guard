@@ -1,11 +1,15 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { isRightToLeft } from "../src/i18n.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const locales = ["en", "pt_BR", "es"];
+const locales = [
+  "en", "zh_CN", "hi", "es", "ar", "fr", "bn", "pt_BR", "id", "ur",
+  "ru", "de", "ja", "pcm", "ar_EG", "mr", "vi", "te", "sw", "ha"
+];
 const sourceFiles = [
   "options.html",
   "src/options.js",
@@ -24,6 +28,34 @@ test("all i18n keys used by extension UI exist in every locale", async () => {
   const englishKeys = Object.keys(messages.get("en")).sort();
   for (const locale of locales.slice(1)) {
     assert.deepEqual(Object.keys(messages.get(locale)).sort(), englishKeys, `${locale} keys`);
+  }
+  assert.deepEqual(
+    (await readdir(path.join(root, "_locales"), { withFileTypes: true }))
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .sort(),
+    [...locales].sort(),
+    "supported locale directories"
+  );
+  assert.deepEqual(
+    (await readdir(path.join(root, "docs", "locales")))
+      .filter((file) => file.endsWith(".md"))
+      .map((file) => file.slice(0, -3))
+      .sort(),
+    [...locales].sort(),
+    "localized user guides"
+  );
+  for (const locale of locales) {
+    for (const key of englishKeys) {
+      const placeholders = (value) => [...value.matchAll(/\{[0-9]+\}/g)]
+        .map(([placeholder]) => placeholder)
+        .sort();
+      assert.deepEqual(
+        placeholders(messages.get(locale)[key].message),
+        placeholders(messages.get("en")[key].message),
+        `${locale}.${key} placeholders`
+      );
+    }
   }
 
   const source = (await Promise.all(sourceFiles.map((file) =>
@@ -62,4 +94,13 @@ test("localized free-confirmation copy matches requested UI language strings", a
     assert.equal(messages.toastCopyOK.message, values[0]);
     assert.equal(messages.toastPasteOK.message, values[1]);
   }
+});
+
+test("right-to-left languages are detected from browser locale tags", () => {
+  assert.equal(isRightToLeft("ar"), true);
+  assert.equal(isRightToLeft("ar-EG"), true);
+  assert.equal(isRightToLeft("ar_EG"), true);
+  assert.equal(isRightToLeft("ur-PK"), true);
+  assert.equal(isRightToLeft("en-US"), false);
+  assert.equal(isRightToLeft("zh_CN"), false);
 });

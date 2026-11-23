@@ -1,4 +1,4 @@
-import { message, translateMethod, translateReason } from "./i18n.js";
+import { isRightToLeft, message, translateMethod, translateReason } from "./i18n.js";
 
 const api = globalThis.clipGuardApi;
 const enabledKey = "fpMeasurementEnabled";
@@ -23,7 +23,9 @@ function t(key, substitutions) {
 for (const element of document.querySelectorAll("[data-i18n]")) {
   element.textContent = t(element.dataset.i18n);
 }
-document.documentElement.lang = api.i18n.getUILanguage();
+const uiLanguage = api.i18n.getUILanguage();
+document.documentElement.lang = uiLanguage.replaceAll("_", "-");
+document.documentElement.dir = isRightToLeft(uiLanguage) ? "rtl" : "ltr";
 
 function translatedReasons(reasons) {
   return reasons.length

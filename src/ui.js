@@ -1,8 +1,9 @@
-import { translateMethod, translateReason } from "./i18n.js";
+import { isRightToLeft, translateMethod, translateReason } from "./i18n.js";
 
 export function createUI() {
   const api = globalThis.clipGuardApi;
   const host = document.createElement("div");
+  host.dir = isRightToLeft(api.i18n.getUILanguage()) ? "rtl" : "ltr";
   const shadow = host.attachShadow({ mode: "closed" });
   const style = document.createElement("style");
   style.textContent = `

@@ -37,9 +37,13 @@ Abra o projeto gerado no Xcode, revise as permissões e teste a extensão no Saf
 - Analisa texto antes da gravação e antes da inserção em campos da página
 - Bloqueia colagens suspeitas ou permite continuar com confirmação explícita
 - Possui cobertura testada para frames, Shadow DOM e páginas que usam `document.write`, com limitações específicas do Firefox
-- Suporta português brasileiro, inglês e espanhol
+- Suporta 20 idiomas; a interface acompanha o idioma do navegador
 - Não envia o conteúdo analisado para servidores
 - Fornece relatórios locais de avaliação, evasão, privacidade e desempenho
+
+Guias rápidos de instalação e privacidade: [English](docs/locales/en.md), [中文](docs/locales/zh_CN.md), [हिन्दी](docs/locales/hi.md), [Español](docs/locales/es.md), [العربية](docs/locales/ar.md), [Français](docs/locales/fr.md), [বাংলা](docs/locales/bn.md), [Português (Brasil)](docs/locales/pt_BR.md), [Bahasa Indonesia](docs/locales/id.md), [اردو](docs/locales/ur.md), [Русский](docs/locales/ru.md), [Deutsch](docs/locales/de.md), [日本語](docs/locales/ja.md), [Nigerian Pidgin](docs/locales/pcm.md), [العربية المصرية](docs/locales/ar_EG.md), [मराठी](docs/locales/mr.md), [Tiếng Việt](docs/locales/vi.md), [తెలుగు](docs/locales/te.md), [Kiswahili](docs/locales/sw.md) e [Hausa](docs/locales/ha.md).
+
+As traduções foram preparadas com assistência de IA e devem ser revisadas por falantes nativos, especialmente antes da publicação nas lojas.
 
 ## Como funciona
 

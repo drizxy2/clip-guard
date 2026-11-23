@@ -56,3 +56,7 @@ export function translateMethod(method, getMessage) {
   const key = METHOD_KEYS.get(method);
   return key ? message(getMessage, key) : method;
 }
+
+export function isRightToLeft(language) {
+  return /^(ar|ur)(?:[-_]|$)/i.test(language);
+}
