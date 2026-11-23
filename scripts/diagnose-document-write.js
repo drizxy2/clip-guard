@@ -15,7 +15,7 @@ let context;
 
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
 try {
-  const extensionPath = path.join(root, "dist");
+  const extensionPath = path.join(root, "dist", "chromium");
   context = await chromium.launchPersistentContext("", {
     channel: "msedge",
     headless: false,

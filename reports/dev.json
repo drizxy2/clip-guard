@@ -1,29 +1,34 @@
 {
-  "evaluatedAt": "2026-11-12T13:40:13.609Z",
+  "evaluatedAt": "2026-11-23T04:15:38.065Z",
   "split": "dev",
   "corpus": {
-    "benign": 125,
+    "benign": 140,
     "ambiguous": 6,
     "malicious": 56
   },
   "falsePositives": {
-    "count": 6,
-    "total": 125,
-    "ratePercent": 4.8
+    "count": 0,
+    "total": 140,
+    "ratePercent": 0
   },
   "ambiguousFalsePositives": {
-    "count": 6,
+    "count": 0,
     "total": 6,
-    "ratePercent": 100
+    "ratePercent": 0
   },
   "nonAmbiguousFalsePositives": {
     "count": 0,
-    "total": 119,
+    "total": 134,
     "ratePercent": 0
   },
   "falseNegatives": {
     "count": 0,
     "total": 56,
     "ratePercent": 0
+  },
+  "highDetections": {
+    "count": 56,
+    "total": 56,
+    "ratePercent": 100
   }
 }

@@ -1,0 +1,199 @@
+---
+name: code-review
+license: MIT
+description: Use when reviewing code changes for quality, correctness, and security — runs a structured checklist with severity-rated findings
+metadata:
+  category: development
+  agent_type: code-review
+---
+
+# Code Review
+
+## When to Use
+
+- Reviewing pull requests before merge
+- Auditing code changes after a feature branch is complete
+- Self-reviewing your own changes before committing
+- Investigating code quality concerns raised by teammates
+
+## Prerequisites
+
+- Changes are committed or staged in git
+- Access to the repository and its test suite
+- Understanding of the project's coding standards
+
+## Workflow
+
+### 1. Understand the Scope
+
+```powershell
+# See what files changed
+git --no-pager diff --stat main...HEAD
+
+# Get a summary of the diff
+git --no-pager diff main...HEAD --shortstat
+```
+
+For PR reviews, use the `code-review` agent type which is purpose-built for this:
+
+```text
+task agent_type: "code-review"
+prompt: "Review the staged changes in this repository"
+```
+
+### 2. Review Checklist
+
+Evaluate each changed file against these categories:
+
+| Priority | Category | What to Check |
+|----------|----------|---------------|
+| 🔴 Critical | **Correctness** | Logic errors, off-by-one, null handling, race conditions |
+| 🔴 Critical | **Security** | Injection, auth bypass, secret exposure, unsafe deserialization |
+| 🟡 Important | **Error handling** | Missing try/catch, unhandled promise rejections, error propagation |
+| 🟡 Important | **Edge cases** | Empty inputs, large inputs, unicode, concurrent access |
+| 🟢 Minor | **Performance** | N+1 queries, unnecessary re-renders, missing indexes |
+| 🟢 Minor | **Maintainability** | Dead code, unclear naming, missing types |
+
+### 3. Investigate Suspicious Patterns
+
+```powershell
+# Find TODO/FIXME/HACK left in changed files
+git --no-pager diff main...HEAD | Select-String "TODO|FIXME|HACK"
+
+# Check for console.log or debug statements
+git --no-pager diff main...HEAD | Select-String "console\.log|debugger|print\("
+```
+
+### 4. Verify Tests
+
+Before you run tests yourself, make sure the working copy is the code under review. `git status
+--short` should be empty and `git rev-parse HEAD` should equal the PR head (or the commit you were
+asked to review); name that SHA in the review. A checkout can hold uncommitted edits from another
+session, and test results from it may describe code that is not in the change. If the working copy
+has someone else's edits, do not reset or stash them — review in a separate worktree, or say in the
+review that the results came from a modified checkout.
+
+```powershell
+# Ensure tests exist for changed source files
+git --no-pager diff --name-only main...HEAD | Select-String "\.(ts|js|py|go)$"
+
+# Run the test suite
+npm test 2>&1 | Select-Object -Last 20
+```
+
+### 5. Severity Levels for Findings
+
+- **🔴 Blocker** — Must fix before merge (bugs, security issues, data loss)
+- **🟡 Warning** — Should fix, but not a merge blocker (error handling gaps, missing tests)
+- **🟢 Suggestion** — Nice to have (naming, style, minor optimization)
+- **💡 Nitpick** — Optional, low priority (formatting, comment wording)
+
+**Calibrate severity from evidenced impact, not from the pattern** (concept adapted from
+hyhmrright/brooks-lint):
+
+- A Blocker states what breaks, for whom, and the evidence you inspected. A hypothetical worst
+  case, a rule name, or a missing test on its own is not enough.
+- A recommendation to prevent recurrence does not inherit the defect's severity; report it
+  separately at the tier its own evidence supports.
+- Do not downgrade an evidenced high-impact defect because the code is short.
+- When impact evidence is missing, say so and use the lowest tier the inspected code supports —
+  do not invent production scale, exposure, or urgency.
+- Check that each finding's label, emoji, and wording agree before you submit the review.
+
+### 6. Check for Breaking Changes
+
+```powershell
+# Look for changed function signatures or removed exports
+git --no-pager diff main...HEAD -- "*.ts" | Select-String "^[-+].*(export|public|function)"
+
+# Check for changed API routes or database schemas
+grep -rn "router\.\|app\.\|migration" --include="*.ts" src/
+```
+
+## Examples
+
+### Quick Self-Review Before Commit
+
+```powershell
+# Stage changes and review
+git add -A
+git --no-pager diff --cached --stat
+git --no-pager diff --cached
+```
+
+### PR Review with code-review Agent
+
+The `code-review` agent provides high signal-to-noise analysis — it only surfaces
+issues that genuinely matter (bugs, security, logic errors), never style or formatting.
+
+```text
+task agent_type: "code-review"
+prompt: "Review changes between main and the current branch. Focus on correctness and security."
+```
+
+## Common Rationalizations
+
+| Rationalization | Reality |
+|----------------|---------|
+| "LGTM, it's a simple change" | Simple-looking changes can break implicit dependencies. (Hyrum's Law) |
+| "Tests pass, so it's fine" | Tests only verify what's explicitly tested. Reviews catch what tests don't. |
+| "I trust the author" | Reviews aren't distrust — they're a second pair of eyes. Authors miss their own bugs. |
+| "It's a big PR, I'll skim it" | Large PRs need more thorough review. The size itself is the first piece of feedback. |
+| "Security is for the security team later" | Cost to fix in development < cost to fix in production × 100. |
+
+## Reviewing AI-Generated Code
+
+AI-generated code requires the same review standard as human-written code — often a stricter one.
+
+**Core principle**: Treat the AI as a junior engineer. The first output is a draft, not a finished product.
+
+```text
+Verify, Don't Trust.
+Review agent output exactly as you would review a code submission from a new contributor.
+```
+
+### LLM-Specific Checklist
+
+| Risk | What to look for |
+|------|-----------------|
+| **Plausible but wrong logic** | Code that looks correct but contains subtle semantic errors — AI optimizes for appearance |
+| **Hallucinated APIs** | Method names, library versions, or options that don't exist |
+| **Missing edge cases** | AI often generates the happy path only; check null, empty, concurrent, and boundary conditions |
+| **Scope creep** | AI may change code beyond what was asked — diff carefully |
+| **Test quality** | AI-written tests often assert the implementation, not the behavior; verify they would actually catch regressions |
+| **Security assumptions** | AI may apply patterns from its training data that are outdated or contextually wrong |
+
+### Quality Gate Before Merging AI Output
+
+- [ ] Linter passes with no suppressions added
+- [ ] Type checker passes
+- [ ] Tests pass, and at minimum one test was in a failing state before the fix
+- [ ] Manual smoke test on the core path
+- [ ] Edge cases (null, empty, large input, concurrent access) are handled
+- [ ] No new technical debt introduced silently (TODOs, skipped tests, magic values)
+
+## Red Flags
+
+- "LGTM" approval within 2 minutes of a 500-line PR
+- All review comments are style/formatting related (no logic review)
+- No findings on a diff that touches authentication or payment code
+- "I wrote this code, review not needed"
+- Business logic added without corresponding tests
+
+## Verification
+
+- [ ] Actually opened every changed file (didn't just read `git diff --stat`)
+- [ ] 🔴 Critical findings are explicitly marked as Blockers
+- [ ] Auth/authorization code was reviewed from a security perspective
+- [ ] New logic has corresponding tests
+- [ ] Reviewed the full `git --no-pager diff main...HEAD`
+- [ ] If any code was AI-generated, the Quality Gate Before Merging AI Output checklist was applied
+
+## Tips
+
+- Review tests first — they document the intended behavior
+- Read the PR description/issue before the code to understand intent
+- Check the **boundaries** between changed and unchanged code
+- For large PRs, review file-by-file using `view` tool rather than reading raw diffs
+- Use `explore` agent to understand unfamiliar code paths before commenting
+- If a change is too large to review effectively, that itself is feedback worth giving

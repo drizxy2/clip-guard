@@ -8,6 +8,8 @@ import { classify as classifyBefore } from "../reports/pre-holdout-classifier.js
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const corpus = JSON.parse(await readFile(path.join(root, "test", "corpus", "dev-malicious-sim.json"), "utf8"));
+const realClickFix = JSON.parse(await readFile(path.join(root, "test", "corpus", "real-sim.json"), "utf8"));
+const awaitBaselineReport = await readFile(path.join(root, "reports", "first-token-baseline.md"), "utf8");
 const shellToken = /\b(?:powershell(?:\.exe)?|pwsh(?:\.exe)?|cmd(?:\.exe)?|mshta(?:\.exe)?|certutil(?:\.exe)?|bitsadmin(?:\.exe)?|curl|wget|bash)\b/i;
 const urlPattern = /https?:\/\/(?:www\.)?example\.invalid[^\s"'|;&]*/i;
 
@@ -28,6 +30,18 @@ function alternateCase(text) {
 }
 
 const encodedUtf16 = Buffer.from("cmd /c echo calc", "utf16le").toString("base64");
+const firstTokenEvasionCases = [
+  ["sem prefixo", "cmd /c echo test && calc"],
+  ["prefixo isca (set/echo/cd)", 'set "MODE=docs" & echo ready & cd %TEMP% & cmd /c echo test && calc'],
+  ["espaços + aspas + @/&", '  @& "cmd"   /c   echo test && calc'],
+  ["comentário REM antes do comando", "REM exemplo de documentação\ncmd /c echo test && calc"],
+  ["nova linha inicial", "\n  cmd /c echo test && calc"]
+];
+const firstTokenEvasionResults = firstTokenEvasionCases.map(([mutation, text]) => ({
+  mutation,
+  before: readBaselineEvasionLevel(mutation),
+  after: classify(text).level
+}));
 const mutations = {
   "mixed case": corpus.map(({ category, text }) => ({ category, text: alternateCase(text) })),
   "cmd caret": mapMatching(corpus, (text) => /\bpowershell\b/i.test(text), (text) =>
@@ -58,8 +72,16 @@ const mutations = {
   "decimal IP URL": mapMatching(corpus, (text) => urlPattern.test(text), (text) =>
     text.replace(urlPattern, "http://2130706433/demo")),
   "hex IP URL": mapMatching(corpus, (text) => urlPattern.test(text), (text) =>
-    text.replace(urlPattern, "http://0x7f000001/demo"))
+    text.replace(urlPattern, "http://0x7f000001/demo")),
+  "ClickFix cmd/curl.exe": realClickFix
 };
+
+function readBaselineEvasionLevel(mutation) {
+  const report = awaitBaselineReport;
+  const row = report.split("\n").find((line) => line.startsWith(`| ${mutation} |`));
+  if (!row) throw new Error(`O baseline não contém a evasão "${mutation}".`);
+  return row.split("|")[2].trim();
+}
 
 const results = Object.entries(mutations).map(([type, samples]) => {
   const before = samples.filter(({ text }) => classifyBefore(text).level !== "none").length;
@@ -80,6 +102,19 @@ test("normaliza mutações de caixa, caret, aspas, whitespace Unicode e zero-wid
     const result = results.find((entry) => entry.type === type);
     assert.ok(result.total > 0, `nenhuma amostra para ${type}`);
     assert.equal(result.missed, 0, `${type}: ${result.missed}/${result.total} indetectáveis`);
+  }
+});
+
+test("detecta todas as variantes ClickFix cmd neutralizadas", () => {
+  const result = results.find((entry) => entry.type === "ClickFix cmd/curl.exe");
+  assert.equal(result.total, realClickFix.length);
+  assert.equal(result.missed, 0, `${result.missed}/${result.total} indetectáveis`);
+});
+
+test("resiste às evasões de prefixo isca, espaços, comentário e nova linha", () => {
+  for (const { mutation, before, after } of firstTokenEvasionResults) {
+    assert.ok(after !== "none", `${mutation}: continuou indetectável`);
+    assert.ok(["none", "low", "high"].includes(before), `${mutation}: baseline inválido`);
   }
 });
 
@@ -116,7 +151,17 @@ test("grava taxas antes/depois usando somente o corpus dev", async () => {
       : []),
     ...(results.every(({ missed }) => missed === 0)
       ? ["Nenhuma das mutações avaliadas no conjunto dev permaneceu indetectável.", ""]
-      : ["A construção dinâmica de variáveis que não pertence às mutações obrigatórias continua fora do escopo de reconstrução sem executar o comando.", ""])
+      : ["A construção dinâmica de variáveis que não pertence às mutações obrigatórias continua fora do escopo de reconstrução sem executar o comando.", ""]),
+    "## Evasões de primeiro token",
+    "",
+    "Comparação com os níveis registrados em `reports/first-token-baseline.md` antes da alteração.",
+    "",
+    "| Caso | Antes | Depois |",
+    "| --- | --- | --- |",
+    ...firstTokenEvasionResults.map(({ mutation, before, after }) =>
+      `| ${mutation} | ${before} | ${after} |`
+    ),
+    ""
   ].join("\n");
   await mkdir(path.join(root, "reports"), { recursive: true });
   await writeFile(path.join(root, "reports", "evasion.md"), report);

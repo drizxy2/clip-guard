@@ -1,17 +1,21 @@
 {
   "manifest_version": 3,
-  "name": "clip-guard",
+  "name": "__MSG_extensionName__",
   "version": "0.1.0",
-  "description": "Alertas locais para comandos de shell suspeitos na área de transferência.",
-  "permissions": ["storage"],
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "en",
+  "permissions": [
+    "storage"
+  ],
   "options_page": "options.html",
-  "background": {
-    "service_worker": "src/background.js"
-  },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["src/hook-main.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "src/hook-main.js"
+      ],
       "all_frames": true,
       "match_about_blank": true,
       "match_origin_as_fallback": true,
@@ -19,8 +23,13 @@
       "world": "MAIN"
     },
     {
-      "matches": ["<all_urls>"],
-      "js": ["src/bridge.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "src/compat.js",
+        "src/bridge.js"
+      ],
       "all_frames": true,
       "match_about_blank": true,
       "match_origin_as_fallback": true,
@@ -29,6 +38,9 @@
     }
   ],
   "action": {
-    "default_title": "Clip Guard"
+    "default_title": "__MSG_actionTitle__"
+  },
+  "background": {
+    "service_worker": "src/background.js"
   }
 }

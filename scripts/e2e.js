@@ -61,7 +61,7 @@ async function waitForText(page, text, timeout = 7000) {
 async function waitForAlert(pageOrFrame) {
   try {
     await pageOrFrame.waitForFunction(
-      () => document.querySelector('[aria-live="polite"][data-clip-guard-state="alert"]'),
+      () => document.querySelector('[data-clip-guard-state="alert"]'),
       undefined,
       { timeout: 7000 }
     );
@@ -69,8 +69,8 @@ async function waitForAlert(pageOrFrame) {
     const details = await pageOrFrame.evaluate(() => ({
       url: location.href,
       origin: location.origin,
-      hostCount: document.querySelectorAll('[aria-live="polite"]').length,
-      state: document.querySelector('[aria-live="polite"]')?.getAttribute("data-clip-guard-state"),
+      hostCount: document.querySelectorAll('[data-clip-guard-state]').length,
+      state: document.querySelector('[data-clip-guard-state]')?.getAttribute("data-clip-guard-state"),
       hookInstalled: Boolean(window.__clip_guard_hook_state__)
     })).catch(() => null);
     throw new Error(`${String(error?.message || error).split("\n")[0]} ${JSON.stringify(details)}`);
@@ -109,6 +109,14 @@ async function newBasePage() {
   const page = await context.newPage();
   await page.goto(`http://localhost:${server.address().port}/`);
   return page;
+}
+
+async function setProtectionMode(mode) {
+  let worker = context.serviceWorkers().find((serviceWorker) =>
+    serviceWorker.url().startsWith("chrome-extension://")
+  );
+  if (!worker) worker = await context.waitForEvent("serviceworker", { timeout: 5000 });
+  await worker.evaluate((value) => chrome.storage.local.set({ protectionMode: value }), mode);
 }
 
 async function record(name, action) {
@@ -156,6 +164,11 @@ async function observeTopMessages(page) {
 }
 
 async function writeFromFrame(frame) {
+  await frame.waitForFunction(
+    () => window.__clip_guard_hook_state__?.protectionMode === "warn",
+    undefined,
+    { timeout: 7000 }
+  );
   await frame.evaluate(() => {
     window.__clipGuardMessages = [];
     addEventListener("message", (event) => {
@@ -215,11 +228,9 @@ async function pasteTarget(name, action) {
     const page = await newBasePage();
     try {
       await preparePasteTarget(page, name);
-      await page.evaluate((text) => navigator.clipboard.writeText(text), pasteText);
-      await waitForText(page, "Clip Guard: área de transferência alterada");
       await triggerPaste(page, pasteText);
-      await waitForText(page, "Colagem bloqueada por segurança");
-      await clickShadowButton(page, "Colar mesmo assim");
+      await waitForText(page, "Paste blocked by Clip Guard");
+      await clickShadowButton(page, "Paste anyway");
       await page.waitForTimeout(200);
       const actual = await readPasteTarget(page, name);
       const expected = name === "input" ? `prefix${pasteText.replace(/\n/g, "")}suffix` :
@@ -233,11 +244,9 @@ async function pasteTarget(name, action) {
     const page = await newBasePage();
     try {
       await preparePasteTarget(page, name);
-      await page.evaluate((text) => navigator.clipboard.writeText(text), pasteText);
-      await waitForText(page, "Clip Guard: área de transferência alterada");
       await triggerPaste(page, pasteText);
-      await waitForText(page, "Colagem bloqueada por segurança");
-      await clickShadowButton(page, "Cancelar");
+      await waitForText(page, "Paste blocked by Clip Guard");
+      await clickShadowButton(page, "Keep blocked");
       const actual = await readPasteTarget(page, name);
       if (actual !== "prefixTARGETsuffix") throw new Error(`Cancelar alterou o campo: ${JSON.stringify(actual)}`);
     } finally {
@@ -293,12 +302,12 @@ async function readPasteTarget(page, name) {
 
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
 try {
-  const extensionPath = path.join(root, "dist");
+  const extensionPath = path.join(root, "dist", "chromium");
   context = await chromium.launchPersistentContext("", {
     channel: "msedge",
     headless: false,
     acceptDownloads: true,
-    args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`]
+    args: ["--lang=en-US", `--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`]
   });
   const base = `http://localhost:${server.address().port}`;
   const crossOrigin = `http://127.0.0.1:${server.address().port}`;
@@ -310,6 +319,7 @@ try {
     ["clipboard-read", "clipboard-write"],
     { origin: crossOrigin }
   );
+  await setProtectionMode("warn");
 
   await record("Escrita em iframe cross-origin", async () => {
     const page = await newBasePage();
@@ -374,7 +384,7 @@ try {
       if (!frame) throw new Error("Frame same-origin não carregou");
       await observeTopMessages(page);
       await frame.waitForFunction(
-        () => document.querySelector('[aria-live="polite"]'),
+        () => window.__clip_guard_hook_state__?.listenersInstalled === true,
         undefined,
         { timeout: 7000 }
       );
@@ -396,7 +406,7 @@ try {
     const page = await newBasePage();
     try {
       await page.locator("#paste-shadow").locator("#copy-shadow").click();
-      await waitForText(page, "Clip Guard: área de transferência alterada");
+      await waitForText(page, "Clipboard alert");
     } finally {
       await page.close();
     }
@@ -416,7 +426,7 @@ try {
         }, { once: true });
         document.execCommand("copy");
       }, suspicious);
-      await waitForText(page, "Clip Guard: área de transferência alterada");
+      await waitForText(page, "Clipboard alert");
     } finally {
       await page.close();
     }
@@ -433,7 +443,7 @@ try {
         field.select();
         document.execCommand("copy");
       }, suspicious);
-      await waitForText(page, "Clip Guard: área de transferência alterada");
+      await waitForText(page, "Clipboard alert");
     } finally {
       await page.close();
     }
@@ -445,7 +455,7 @@ try {
         const item = new ClipboardItem({ "text/plain": new Blob([text], { type: "text/plain" }) });
         await navigator.clipboard.write([item]);
       }, suspicious);
-      await waitForText(page, "Clip Guard: área de transferência alterada");
+      await waitForText(page, "Clipboard alert");
     } finally {
       await page.close();
     }
@@ -454,16 +464,18 @@ try {
     const page = await newBasePage();
     try {
       await page.locator("#fullscreen-copy").click();
-      await waitForText(page, "Clip Guard: área de transferência alterada");
+      await waitForText(page, "Clipboard alert");
     } finally {
       await page.evaluate(() => document.fullscreenElement && document.exitFullscreen()).catch(() => {});
       await page.close();
     }
   });
 
+  await setProtectionMode("block");
   for (const target of ["input", "textarea", "contenteditable", "campo em Shadow DOM"]) {
     await pasteTarget(target === "campo em Shadow DOM" ? "shadow" : target, target);
   }
+  await setProtectionMode("warn");
 
   await record("Medição local desativada por padrão", async () => {
     let worker = context.serviceWorkers().find((serviceWorker) =>
@@ -479,9 +491,40 @@ try {
         throw new Error("A medição local está ativada por padrão");
       }
       await page.evaluate((text) => navigator.clipboard.writeText(text), suspicious);
-      await waitForText(page, "Clip Guard: área de transferência alterada");
+      await waitForText(page, "Clipboard alert");
       const log = await options.evaluate(() => chrome.storage.local.get("fpMeasurementLog"));
       if (log.fpMeasurementLog) throw new Error("O alerta foi salvo com a medição desativada");
+    } finally {
+      await page.close();
+      await options.close();
+    }
+  });
+  await record("Confirmação benigna sem persistir texto/evento", async () => {
+    const worker = context.serviceWorkers().find((serviceWorker) =>
+      serviceWorker.url().startsWith("chrome-extension://")
+    );
+    if (!worker) throw new Error("Service worker da extensão indisponível");
+    const extensionId = new URL(worker.url()).host;
+    const options = await context.newPage();
+    const page = await newBasePage();
+    try {
+      await options.goto(`chrome-extension://${extensionId}/options.html`);
+      const start = Date.now();
+      await page.evaluate(() => navigator.clipboard.writeText("ordinary documentation text"));
+      await waitForText(page, "Clip Guard: Copy OK ✅");
+      const storage = await options.evaluate(async () =>
+        chrome.storage.local.get(["writeDiagnostics", "fpMeasurementLog"])
+      );
+      const records = JSON.stringify(storage);
+      if (records.includes("ordinary documentation text")) {
+        throw new Error("O conteúdo benigno foi persistido");
+      }
+      const benignEvents = Object.values(storage.writeDiagnostics || {}).flatMap((value) =>
+        Array.isArray(value) ? value : [value]
+      ).filter((entry) =>
+        entry.method === "navigator.clipboard.writeText" && entry.time >= start
+      );
+      if (benignEvents.length) throw new Error("Evento benigno foi registrado como diagnóstico");
     } finally {
       await page.close();
       await options.close();
@@ -502,7 +545,7 @@ try {
         (await chrome.storage.local.get("fpMeasurementEnabled")).fpMeasurementEnabled === true
       );
       await page.evaluate((text) => navigator.clipboard.writeText(text), suspicious);
-      await waitForText(page, "Clip Guard: área de transferência alterada");
+      await waitForText(page, "Clipboard alert");
       await options.waitForFunction(async () => {
         const values = await chrome.storage.local.get("fpMeasurementLog");
         return Object.values(values.fpMeasurementLog || {}).some((entries) => entries.length > 0);
@@ -540,7 +583,7 @@ try {
     try {
       await page.locator("#copy-legitimate").click();
       await page.waitForTimeout(700);
-      if ((await composedText(page)).includes("Clip Guard: área de transferência alterada")) {
+      if ((await composedText(page)).includes("Clipboard alert")) {
         throw new Error("O botão legítimo gerou alerta");
       }
     } finally {

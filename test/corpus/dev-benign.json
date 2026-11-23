@@ -498,5 +498,65 @@
   {
     "category": "recipes-and-text",
     "text": "Remember to water the basil plant every other morning."
+  },
+  {
+    "category": "clickfix-benign-curl",
+    "text": "curl.exe -o release-notes.txt https://docs.example.invalid/releases/latest"
+  },
+  {
+    "category": "clickfix-benign-curl",
+    "text": "curl.exe --output api-response.json https://api.example.invalid/v1/status"
+  },
+  {
+    "category": "clickfix-benign-curl",
+    "text": "curl.exe -o .\\manual.pdf https://docs.example.invalid/manual.pdf"
+  },
+  {
+    "category": "clickfix-benign-curl",
+    "text": "curl.exe -o archive.zip https://downloads.example.invalid/project/archive.zip"
+  },
+  {
+    "category": "clickfix-benign-curl",
+    "text": "curl.exe -o schema.json https://schemas.example.invalid/v2/schema.json"
+  },
+  {
+    "category": "clickfix-benign-cmd",
+    "text": "set BUILD_MODE=release && npm run build"
+  },
+  {
+    "category": "clickfix-benign-cmd",
+    "text": "set EDITOR=code && git status --short"
+  },
+  {
+    "category": "clickfix-benign-cmd",
+    "text": "set REPORT_FORMAT=json && node scripts/report.js"
+  },
+  {
+    "category": "clickfix-benign-cmd",
+    "text": "set DOCS_DIR=manual && dir %DOCS_DIR%"
+  },
+  {
+    "category": "clickfix-benign-cmd",
+    "text": "set LOG_LEVEL=info && npm test"
+  },
+  {
+    "category": "clickfix-benign-for-f",
+    "text": "REM Documentation example: for /f \"delims=\" %%i in (paths.txt) do echo %%i"
+  },
+  {
+    "category": "clickfix-benign-for-f",
+    "text": "REM for /f \"tokens=1,2\" %%a in (versions.txt) do echo %%a %%b"
+  },
+  {
+    "category": "clickfix-benign-for-f",
+    "text": "REM Example batch loop: for /f %%i in ('git status --short') do echo %%i"
+  },
+  {
+    "category": "clickfix-benign-certutil",
+    "text": "certutil -hashfile README.md SHA256"
+  },
+  {
+    "category": "clickfix-benign-certutil",
+    "text": "certutil.exe -hashfile \"%USERPROFILE%\\Downloads\\release.zip\" SHA256"
   }
 ]

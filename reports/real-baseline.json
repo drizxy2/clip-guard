@@ -1,0 +1,61 @@
+{
+  "classifier": "original, before ClickFix heuristic changes",
+  "results": [
+    {
+      "index": 1,
+      "notes": "FN inicial",
+      "category": "ClickFix cmd/curl.exe",
+      "score": 0,
+      "level": "none",
+      "reasons": []
+    },
+    {
+      "index": 2,
+      "notes": "variação: http",
+      "category": "ClickFix cmd/curl.exe",
+      "score": 0,
+      "level": "none",
+      "reasons": []
+    },
+    {
+      "index": 3,
+      "notes": "variação: rótulo decimal no domínio reservado",
+      "category": "ClickFix cmd/curl.exe",
+      "score": 0,
+      "level": "none",
+      "reasons": []
+    },
+    {
+      "index": 4,
+      "notes": "variação: %temp%",
+      "category": "ClickFix cmd/curl.exe",
+      "score": 0,
+      "level": "none",
+      "reasons": []
+    },
+    {
+      "index": 5,
+      "notes": "variação: -o",
+      "category": "ClickFix cmd/curl.exe",
+      "score": 0,
+      "level": "none",
+      "reasons": []
+    },
+    {
+      "index": 6,
+      "notes": "variação: segundo for /f",
+      "category": "ClickFix cmd/curl.exe",
+      "score": 0,
+      "level": "none",
+      "reasons": []
+    },
+    {
+      "index": 7,
+      "notes": "variação: quebras de linha",
+      "category": "ClickFix cmd/curl.exe",
+      "score": 0,
+      "level": "none",
+      "reasons": []
+    }
+  ]
+}

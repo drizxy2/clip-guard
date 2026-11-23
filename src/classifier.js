@@ -3,7 +3,10 @@ const COMMAND_PATTERNS = [
   { name: "cmd /c", pattern: /\bcmd(?:\.exe)?\s+\/c\b/i },
   { name: "mshta", pattern: /\bmshta(?:\.exe)?\b/i },
   { name: "rundll32", pattern: /\brundll32(?:\.exe)?\b/i },
-  { name: "certutil", pattern: /\bcertutil(?:\.exe)?\b/i },
+  {
+    name: "certutil transferência/decodificação",
+    pattern: /\bcertutil(?:\.exe)?\b[^\r\n]*(?:-urlcache|-urlfetch|-decode(?:hex)?|-encode(?:hex)?)/i
+  },
   { name: "bitsadmin", pattern: /\bbitsadmin(?:\.exe)?\b/i },
   { name: "substring de variável de ambiente", pattern: /%COMSPEC(?::[^%\r\n]*)?%\s*\/[ck]\b/i },
   { name: "curl/wget para shell", pattern: /\b(?:curl|wget)\b[^\r\n]*(?:\||\|\|?)[ \t]*(?:\/(?:usr\/)?bin\/)?(?:sh|bash|powershell|pwsh)\b/i, points: 2 },
@@ -29,6 +32,15 @@ const KNOWN_COMMANDS = new Set([
   "bitsadmin", "bitsadmin.exe", "curl", "wget", "bash", "bash.exe", "iex",
   "invoke-expression", "downloadstring"
 ]);
+const FIRST_TOKEN_COMMANDS = new Set([
+  "cmd", "powershell", "pwsh", "mshta", "wscript", "cscript", "rundll32",
+  "regsvr32", "certutil", "bitsadmin", "curl", "wget", "bash", "sh"
+]);
+const INERT_COMMAND_PREFIXES = new Set(["set", "echo", "cd"]);
+const GENERIC_EXECUTION_REASONS = new Set([
+  "powershell/pwsh", "cmd /c", "mshta", "rundll32", "bitsadmin"
+]);
+const REMOTE_SCRIPT_COMMANDS = new Set(["mshta", "wscript", "cscript", "rundll32", "regsvr32"]);
 const HOMOGLYPHS = new Map([
   ["а", "a"], ["с", "c"], ["е", "e"], ["і", "i"], ["ј", "j"],
   ["к", "k"], ["м", "m"], ["о", "o"], ["р", "p"], ["ѕ", "s"],
@@ -38,6 +50,22 @@ const HOMOGLYPHS = new Map([
   ["ρ", "p"], ["τ", "t"], ["χ", "x"]
 ]);
 const ENCODED_COMMAND = /(?:^|\s)-(?:enc|encodedcommand|e)\s+["']?([A-Za-z0-9+/]+={0,2})/gi;
+const WRITABLE_DOWNLOAD_PATH = /%(?:tmp|temp|appdata|localappdata)%[\\/]|(?:%userprofile%[\\/]|[A-Za-z]:[\\/](?:Users[\\/][^\\/\s"'|&]+[\\/])?)Downloads[\\/]/i;
+const INDIRECT_FILE_EXECUTION = [
+  /\bfor\s+\/f\b[^\r\n]*\bdo\s+%[A-Za-z_][A-Za-z0-9_]*\b/i,
+  /\btype\s+(?:"[^"\r\n]+"|[^\s|&]+)\s*\|\s*(?:%comspec%|cmd(?:\.exe)?)(?:\s|$)/i,
+  /\bcall\s+"?[^"\s|&]+\.(?:bat|cmd|ps1|vbs|js)\b/i
+];
+const NUMERIC_HOST = /(?:0x[0-9a-f]{1,8}|\d{7,10}|(?:\d{1,3}\.){3}\d{1,3})(?::\d+)?(?=[/?#\s]|$)/gi;
+
+function hasNumericHostWithoutScheme(text) {
+  NUMERIC_HOST.lastIndex = 0;
+  for (const match of text.matchAll(NUMERIC_HOST)) {
+    const prefix = text.slice(0, match.index);
+    if (!/(?:https?|ftp):\/\/\s*$/i.test(prefix)) return true;
+  }
+  return false;
+}
 
 function joinSplitCommands(text) {
   if (!/[\r\n]/.test(text)) return text;
@@ -75,6 +103,42 @@ function normalizeText(text) {
     const mapped = [...token].map((character) => HOMOGLYPHS.get(character) ?? character).join("");
     return KNOWN_COMMANDS.has(mapped.toLowerCase()) ? mapped : token;
   });
+}
+
+function firstExecutableToken(text) {
+  for (const line of text.split(/\r\n?|\n/)) {
+    let remaining = line;
+    while (remaining) {
+      remaining = remaining.replace(/^\s+/u, "");
+      if (!remaining) break;
+      const prefixes = remaining.match(/^(?:@|&|;|\|)+/u);
+      if (prefixes) {
+        remaining = remaining.slice(prefixes[0].length);
+        continue;
+      }
+      if (/^::/.test(remaining)) break;
+
+      const quoted = remaining.match(/^(['"])(.*?)\1(?=$|[\s&|;])/u);
+      const tokenMatch = quoted ?? remaining.match(/^[^\s&|;]+/u);
+      if (!tokenMatch) break;
+      const token = (quoted ? quoted[2] : tokenMatch[0])
+        .split(/[\\/]/)
+        .at(-1)
+        .replace(/\.exe$/i, "")
+        .toLowerCase();
+      remaining = remaining.slice(tokenMatch[0].length);
+
+      if (token === "rem") break;
+      if (INERT_COMMAND_PREFIXES.has(token)) {
+        const separator = remaining.search(/[&|;]/u);
+        if (separator < 0) break;
+        remaining = remaining.slice(separator);
+        continue;
+      }
+      return token;
+    }
+  }
+  return "";
 }
 
 function decodeEncodedCommands(text) {
@@ -134,6 +198,28 @@ export function classify(text, context = {}) {
     hasContentEvidence ||= evidence;
   };
 
+  const cmdClickFixSignals = {
+    downloadToWritablePath:
+      /\b(?:curl(?:\.exe)?|wget(?:\.exe)?|bitsadmin(?:\.exe)?|certutil(?:\.exe)?)\b/i.test(normalized) &&
+      WRITABLE_DOWNLOAD_PATH.test(normalized),
+    indirectFileExecution: INDIRECT_FILE_EXECUTION.some((pattern) => pattern.test(normalized)),
+    environmentChain:
+      /%[A-Za-z_][A-Za-z0-9_]*%/.test(normalized) && /&&|(?<!&)&(?!&)/.test(normalized),
+    numericHostWithoutScheme: hasNumericHostWithoutScheme(normalized)
+  };
+  const hasDownloadExecutionPair =
+    cmdClickFixSignals.downloadToWritablePath && cmdClickFixSignals.indirectFileExecution;
+  if (hasDownloadExecutionPair) {
+    add("download em diretório gravável + execução indireta", 5);
+    if (cmdClickFixSignals.environmentChain) {
+      add("variáveis de ambiente do cmd com encadeamento", 2);
+    }
+    if (cmdClickFixSignals.numericHostWithoutScheme) {
+      add("host numérico sem esquema", 1);
+    }
+  }
+
+  const firstToken = firstExecutableToken(normalized);
   for (const scanValue of scanValues) {
     for (const { name, pattern, points = 4 } of COMMAND_PATTERNS) {
       if (pattern.test(scanValue)) add(name, points);
@@ -150,6 +236,21 @@ export function classify(text, context = {}) {
     }
   }
 
+  const hasChainedCommand = CHAIN_OPERATORS.some((operator) =>
+    (operator !== "|" || !["curl", "wget"].includes(firstToken)) &&
+      scanValues.some((scanValue) => scanValue.includes(operator))
+  );
+  const remoteScriptArgument = REMOTE_SCRIPT_COMMANDS.has(firstToken) &&
+    /https?:\/\/|\\\\/i.test(normalized);
+  const hasIndependentRisk = hasDownloadExecutionPair || hasChainedCommand || remoteScriptArgument ||
+    reasons.some((reason) =>
+      !GENERIC_EXECUTION_REASONS.has(reason) &&
+      !(["curl", "wget"].includes(firstToken) && reason === "curl/wget para shell")
+    );
+  if (FIRST_TOKEN_COMMANDS.has(firstToken) && hasIndependentRisk) {
+    add(`primeiro token de comando (${firstToken})`, 1);
+  }
+
   if (hasContentEvidence) {
     for (const operator of CHAIN_OPERATORS) {
       if (scanValues.some((scanValue) => scanValue.includes(operator))) {
@@ -157,6 +258,15 @@ export function classify(text, context = {}) {
       }
     }
   }
+
+  const installerEndpoint =
+    /https?:\/\/[^\s"'<>|]+\/(?:[^?#\s"'<>|]+\/)*(?:install(?:er)?(?:\.sh)?|setup(?:\.sh)?|bootstrap(?:\.sh)?|get\.sh|cli)(?:[?#\s"'<>|]|$)/i
+      .test(normalized);
+  const isolatedCurlPipe = installerEndpoint && ["curl", "wget"].includes(firstToken) &&
+    reasons.includes("curl/wget para shell") &&
+    reasons.every((reason) => reason === "curl/wget para shell" || reason === "encadeamento |") &&
+    !scanValues.some((scanValue) => /&&|\|\||;/u.test(scanValue));
+  if (isolatedCurlPipe) return { score: 0, level: "none", reasons: [] };
 
   if (/\r?\n$/.test(value) && hasContentEvidence) add("quebra de linha final", 0.25, false);
 

@@ -6,16 +6,24 @@
   "scripts": {
     "test": "node --test",
     "build": "node scripts/build.js",
+    "lint:firefox": "web-ext lint --source-dir dist/firefox",
     "eval": "node scripts/evaluate-dev.js",
     "import-local": "node scripts/import-local.js",
     "perf": "node scripts/perf.js",
-    "e2e": "npm run build && node scripts/e2e.js",
+    "e2e": "npm run build && node scripts/e2e.js && node scripts/e2e-blocking.js && node scripts/e2e-enhancements.js",
+    "e2e:firefox": "npm run build && node scripts/e2e-firefox.js && node scripts/e2e-firefox-enhancements.js",
     "generate:corpus": "node scripts/generate-corpus.js"
   },
   "engines": {
     "node": ">=18"
   },
   "devDependencies": {
-    "playwright": "^1.65.0"
+    "geckodriver": "^8.0.0",
+    "playwright": "^1.65.0",
+    "selenium-webdriver": "^4.51.0",
+    "web-ext": "^10.8.0"
+  },
+  "allowScripts": {
+    "geckodriver@8.0.0": true
   }
 }

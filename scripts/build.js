@@ -72,60 +72,120 @@ async function walk(directory, relative = "") {
   return result;
 }
 
-const manifestPath = path.join(root, "manifest.json");
-const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
-assert(manifest.manifest_version === 3, "manifest_version precisa ser 3");
-assert(manifest.permissions?.includes("storage"), "manifest precisa da permissão storage");
-assert(manifest.content_scripts?.some((script) =>
-  script.all_frames && script.match_about_blank && script.match_origin_as_fallback &&
-    script.run_at === "document_start" && script.world === "MAIN"
-), "hook MAIN precisa rodar em todos os frames no document_start");
-assert(manifest.content_scripts?.some((script) =>
-  script.all_frames && script.match_about_blank && script.match_origin_as_fallback &&
-    script.run_at === "document_start" && script.world === "ISOLATED"
-), "bridge ISOLATED precisa rodar em todos os frames no document_start");
-
 await rm(dist, { recursive: true, force: true });
-await mkdir(path.join(dist, "src"), { recursive: true });
-await mkdir(path.join(dist, "test", "pages"), { recursive: true });
-await mkdir(path.join(dist, "scripts"), { recursive: true });
-
-for (const file of ["package.json", "README.md"]) {
-  await copyFile(path.join(root, file), path.join(dist, file));
-}
-await copyFile(path.join(root, "options.html"), path.join(dist, "options.html"));
-await copyFile(manifestPath, path.join(dist, "manifest.json"));
-await copyFile(path.join(root, "src", "classifier.js"), path.join(dist, "src", "classifier.js"));
-await copyFile(path.join(root, "src", "ui.js"), path.join(dist, "src", "ui.js"));
-await copyFile(path.join(root, "src", "background.js"), path.join(dist, "src", "background.js"));
-await copyFile(path.join(root, "src", "options.js"), path.join(dist, "src", "options.js"));
-await copyFile(path.join(root, "test", "pages", "clickfix-demo.html"), path.join(dist, "test", "pages", "clickfix-demo.html"));
-
 const classifier = (await readFile(path.join(root, "src", "classifier.js"), "utf8"))
   .replace(/^export\s+/gm, "");
 const hook = (await readFile(path.join(root, "src", "hook-main.js"), "utf8"))
   .replace(/^import\s+\{\s*classify\s*\}\s+from\s+["'][^"']+["'];\s*/m, "");
 assert(!/^\s*import\s/m.test(hook), "hook MAIN contém import não compilado");
-await writeFile(path.join(dist, "src", "hook-main.js"), `${classifier}\n${hook}`);
 
 const ui = (await readFile(path.join(root, "src", "ui.js"), "utf8"))
+  .replace(/^export\s+/gm, "");
+const i18n = (await readFile(path.join(root, "src", "i18n.js"), "utf8"))
   .replace(/^export\s+/gm, "");
 const bridge = (await readFile(path.join(root, "src", "bridge.js"), "utf8"))
   .replace(/^import\s+\{\s*createUI\s*\}\s+from\s+["'][^"']+["'];\s*/m, "");
 assert(!/^\s*import\s/m.test(bridge), "bridge ISOLATED contém import não compilado");
-await writeFile(path.join(dist, "src", "bridge.js"), `${ui}\n${bridge}`);
+const compiledUI = ui.replace(
+  /^import\s+\{\s*translateMethod,\s*translateReason\s*\}\s+from\s+["'][^"']+["'];\s*/m,
+  ""
+);
+assert(!/^\s*import\s/m.test(compiledUI), "UI ISOLATED contém import não compilado");
 
-const files = await walk(dist);
-const entries = [];
-for (const relative of files) {
-  const data = await readFile(path.join(dist, relative));
-  entries.push({ name: relative, data });
-}
-const archive = zipStored(entries);
-await writeFile(path.join(dist, "clip-guard.zip"), archive);
+const baseManifest = JSON.parse(await readFile(path.join(root, "build", "manifest.base.json"), "utf8"));
+const targets = ["chromium", "firefox"];
 
-for (const relative of files) {
-  const data = await readFile(path.join(dist, relative));
-  console.log(`${createHash("sha256").update(data).digest("hex")}  dist/${relative.replaceAll("\\", "/")}`);
+for (const browser of targets) {
+  const browserDiff = JSON.parse(await readFile(
+    path.join(root, "build", `manifest.${browser}.json`),
+    "utf8"
+  ));
+  const manifest = { ...baseManifest, ...browserDiff };
+  assert(manifest.manifest_version === 3, `${browser}: manifest_version precisa ser 3`);
+  assert(manifest.default_locale === "en", `${browser}: default_locale precisa ser en`);
+  assert(manifest.name === "__MSG_extensionName__" &&
+    manifest.description === "__MSG_extensionDescription__",
+  `${browser}: nome/descrição precisam usar mensagens i18n`);
+  assert(manifest.permissions?.includes("storage"), `${browser}: manifesto precisa da permissão storage`);
+  assert(manifest.content_scripts?.some((script) =>
+    script.all_frames && script.match_about_blank && script.match_origin_as_fallback &&
+      script.run_at === "document_start" && script.world === "MAIN"
+  ), `${browser}: hook MAIN precisa rodar em todos os frames no document_start`);
+  assert(manifest.content_scripts?.some((script) =>
+    script.all_frames && script.match_about_blank && script.match_origin_as_fallback &&
+      script.run_at === "document_start" && script.world === "ISOLATED" &&
+      script.js?.[0] === "src/compat.js"
+  ), `${browser}: bridge ISOLATED precisa rodar em todos os frames no document_start`);
+  if (browser === "chromium") {
+    assert(manifest.background?.service_worker, "Chromium precisa de service_worker");
+  } else {
+    assert(manifest.background?.scripts?.includes("src/background.js"),
+      "Firefox precisa de background.scripts");
+    assert(manifest.background.scripts.indexOf("src/compat.js") <
+      manifest.background.scripts.indexOf("src/background.js"),
+    "Firefox precisa carregar a compatibilidade antes do background");
+    assert(manifest.browser_specific_settings?.gecko?.id === "clip-guard@local.example",
+      "Firefox precisa do ID Gecko configurado");
+    assert(manifest.browser_specific_settings.gecko.strict_min_version === "128.0",
+      "Firefox precisa da versão mínima 128.0");
+  }
+
+  const output = path.join(dist, browser);
+  await mkdir(path.join(output, "src"), { recursive: true });
+  for (const file of ["package.json", "README.md"]) {
+    await copyFile(path.join(root, file), path.join(output, file));
+  }
+  await copyFile(path.join(root, "options.html"), path.join(output, "options.html"));
+  await writeFile(path.join(output, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
+  for (const file of ["classifier.js", "ui.js", "i18n.js", "compat.js", "options.js"]) {
+    await copyFile(path.join(root, "src", file), path.join(output, "src", file));
+  }
+  if (browser === "chromium") {
+    const compat = await readFile(path.join(root, "src", "compat.js"), "utf8");
+    const background = await readFile(path.join(root, "src", "background.js"), "utf8");
+    await writeFile(path.join(output, "src", "background.js"), `${compat}\n${background}`);
+  } else {
+    await copyFile(
+      path.join(root, "src", "background.js"),
+      path.join(output, "src", "background.js")
+    );
+  }
+  await writeFile(path.join(output, "src", "hook-main.js"), `${classifier}\n${hook}`);
+  await writeFile(path.join(output, "src", "bridge.js"), `${i18n}\n${compiledUI}\n${bridge}`);
+
+  for (const locale of ["en", "pt_BR", "es"]) {
+    const localeDirectory = path.join(output, "_locales", locale);
+    await mkdir(localeDirectory, { recursive: true });
+    await copyFile(
+      path.join(root, "_locales", locale, "messages.json"),
+      path.join(localeDirectory, "messages.json")
+    );
+  }
+
+  const files = await walk(output);
+  const entries = [];
+  for (const relative of files) {
+    const data = await readFile(path.join(output, relative));
+    entries.push({ name: relative, data });
+  }
+  const archive = zipStored(entries);
+  const archivePath = path.join(dist, `${browser}.zip`);
+  await writeFile(archivePath, archive);
+
+  if (browser === "chromium") {
+    await writeFile(path.join(root, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
+  }
+  for (const relative of files) {
+    const data = await readFile(path.join(output, relative));
+    console.log(`${createHash("sha256").update(data).digest("hex")}  dist/${browser}/${relative.replaceAll("\\", "/")}`);
+  }
+  console.log(`${createHash("sha256").update(archive).digest("hex")}  dist/${browser}.zip`);
 }
-console.log(`${createHash("sha256").update(archive).digest("hex")}  dist/clip-guard.zip`);
+
+const chromiumArchive = path.join(dist, "chromium.zip");
+const releaseArchive = path.join(dist, "clip-guard.zip");
+await copyFile(chromiumArchive, releaseArchive);
+const releaseHash = createHash("sha256")
+  .update(await readFile(releaseArchive))
+  .digest("hex");
+console.log(`${releaseHash}  dist/clip-guard.zip`);

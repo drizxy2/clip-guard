@@ -1,48 +1,202 @@
-# clip-guard
+# Clip Guard
 
-Protótipo local de extensão Chromium Manifest V3 para alertar sobre gravações suspeitas de comandos de shell na área de transferência e pedir confirmação antes de colar conteúdo correspondente.
+**Clip Guard** é uma extensão de navegador que detecta conteúdo suspeito de linha de comando antes que ele seja gravado no clipboard ou colado em uma página.
 
-## Carregar no Chromium
+O projeto oferece interceptação para navegadores baseados em Chromium e Firefox, com proteção em **modo bloqueio** e uma opção mais permissiva em **modo aviso**.
 
-1. Execute `npm test`, `npm run eval`, `npm run e2e` e `npm run build`.
-2. Abra `chrome://extensions` (ou `edge://extensions`) e ative o modo de desenvolvedor.
-3. Use **Carregar sem compactação** e selecione a pasta `dist/`.
-4. Para a página de demonstração, abra `test/pages/clickfix-demo.html` por um servidor local em uma origem segura, ou use um arquivo local se o navegador permitir clipboard nessa origem. Clique nos dois botões para comparar os alertas.
+> Protótipo experimental: heurísticas podem gerar falsos positivos ou falsos negativos. O Clip Guard não substitui controles do sistema operacional ou análise de segurança.
 
-O botão de demonstração simula somente `cmd /c echo test && calc`; não execute esse texto.
+## Compatibilidade
 
-## Desenvolvimento e reprodução
+| Navegador | Status | Observações |
+| --- | --- | --- |
+| Microsoft Edge (Chromium) | Testado | Testes E2E automatizados neste navegador; a versão registrada é 157.0.4341.46. |
+| Firefox Desktop 160.0.1 | Testado | Testes E2E automatizados; 128.0 é o mínimo declarado, mas versões anteriores à testada não foram verificadas. |
+| Chrome / Chromium | Esperado funcionar, não testado | Usa o manifesto Chromium MV3; a execução E2E disponível neste projeto usa Edge. |
+| Brave, Opera e Vivaldi | Esperado funcionar, não testado | Baseados em Chromium; não foram testados individualmente. |
+| Safari | Suporte experimental, não testado | Requer macOS + Xcode e conversão da Web Extension; veja os passos abaixo. |
+| Chrome para Android | Não suportado | Chrome para Android não oferece suporte a extensões. |
+| Firefox para Android | Esperado funcionar, não testado | A plataforma pode oferecer suporte a extensões, mas este projeto não foi testado nela. |
 
-- Requer Node.js 18 ou superior; não há dependências externas em runtime. Playwright é usado somente no teste e2e.
-- `npm test` executa os testes `node:test`, incluindo avaliação por mutação, verificação de privacidade/rede e geração de `reports/evasion.md`.
-- `npm run eval` recalcula dev, holdout, evasão, E2E e desempenho e escreve `reports/SUMMARY.md`; amostras opcionais `real-sim.json` e `real-benign.json` geram métricas sem incluir texto.
-- `npm run import-local -- <arquivo.json>` importa o JSON exportado nas opções e gera `reports/local-fp.md`, agrupado por origem, nível e motivos, sem texto.
-- `npm run e2e` reconstrói a extensão e testa os cenários no Microsoft Edge instalado; requer Playwright e Edge.
-- `npm run perf` mede `classify()` em 100 caracteres, 10 KiB e 1 MiB e escreve `reports/perf.md`.
-- `npm run generate:corpus` regenera os corpora independentes em `test/corpus/`.
-- `test/corpus/README.md` documenta o formato neutralizado de amostras locais; os arquivos `real-*.json` são ignorados pelo Git.
-- `npm run build` valida o manifesto, gera `dist/`, cria `dist/clip-guard.zip` e imprime SHA-256 por arquivo e para o ZIP.
-- `reports/privacy.md`, `reports/coverage.md`, `reports/e2e.md`, `reports/evasion.md`, `reports/dev.md` e `reports/holdout.md` detalham as verificações e resultados.
+Extensões não são executadas em páginas restritas do navegador, como `chrome://`, `edge://`, `about:` ou páginas de extensões. No Firefox, frames vazios `about:blank` podem não receber os scripts no início do documento. A extensão só observa operações de clipboard ocorridas dentro de páginas às quais os content scripts têm acesso; colagens em outros aplicativos ou fora do navegador não são detectáveis.
 
-## Heurísticas e resultados
+### Conversão experimental para Safari
 
-A classificação normaliza Unicode NFKC, remove caracteres zero-width e separadores `^`/aspas inseridos dentro de tokens, e inspeciona em memória argumentos PowerShell `-enc`/`-EncodedCommand` Base64 de até 64 KiB decodificados. Também considera famílias de utilitários de shell, opções de PowerShell, encadeamento de comandos, Base64 longo, frases de verificação e sinais de contexto (fullscreen, iframe cross-origin e interação recente). Contexto só aumenta a pontuação se já houver evidência textual. Pipes de instaladores por `curl`/`wget` ficam em nível baixo por serem ambíguos; o corpus benigno inclui exemplos de instalação, documentação, código, dados e texto multilíngue.
+Não foi possível gerar ou testar o app do Safari neste ambiente Windows. Em um Mac com Xcode instalado, gere primeiro o diretório Chromium e então execute:
 
-O conjunto de desenvolvimento contém 125 amostras benignas e 56 simuladas maliciosas: após os ajustes, houve 6/125 falsos positivos (4,80%, todos ambíguos) e 0/56 falsos negativos. No holdout reservado (50 benignas/23 simuladas maliciosas), a medição congelada e a avaliação final única foram ambas 2/50 FP (4,00%), 2/2 FP ambíguos e 0/23 FN; não houve ajuste no holdout. `reports/holdout.md` apresenta os resultados lado a lado. Os resultados de evasão antes/depois no conjunto dev estão em `reports/evasion.md`; concatenação simples (11/14→14/14), homógrafos (11/14→14/14), comandos divididos em linhas (21/55→55/55) e substring de variável de ambiente (0/1→1/1) foram tratados. Expressões de variável dinâmica permanecem uma limitação medida (0/1).
+```bash
+npm run build
+xcrun safari-web-extension-converter dist/chromium --project-location safari --app-name "Clip Guard"
+```
 
-`reports/perf.md` registra medições locais: média/p99 de 0,0204/0,1904 ms para 100 caracteres, 0,9167/2,9596 ms para 10 KiB e 8,5493/13,4978 ms para 1 MiB. Entradas acima de 100 KiB são limitadas aos primeiros e últimos 50 KiB. Os tempos são específicos do ambiente local Node.js 24.21.0/Windows e não representam benchmark de produção.
+Abra o projeto gerado no Xcode, revise as permissões e teste a extensão no Safari antes de considerar esse navegador compatível. Essa conversão é experimental e pode exigir ajustes de APIs ou do manifesto.
+
+## Recursos
+
+- Intercepta APIs comuns de clipboard e eventos `copy`, `cut`, `paste` e `drop`
+- Analisa texto antes da gravação e antes da inserção em campos da página
+- Bloqueia colagens suspeitas ou permite continuar com confirmação explícita
+- Possui cobertura testada para frames, Shadow DOM e páginas que usam `document.write`, com limitações específicas do Firefox
+- Suporta português brasileiro, inglês e espanhol
+- Não envia o conteúdo analisado para servidores
+- Fornece relatórios locais de avaliação, evasão, privacidade e desempenho
+
+## Como funciona
+
+O texto é normalizado com NFKC, caracteres ocultos são removidos e variantes comuns de escrita, como homógrafos, caracteres de separação e comandos divididos em linhas, são consideradas pela heurística.
+
+O classificador procura sinais como:
+
+- PowerShell, CMD, MSHTA, Rundll32 e outros utilitários de shell
+- Comandos encadeados e opções suspeitas
+- Download seguido de execução indireta
+- Comandos Base64 codificados
+- Frases de verificação associadas a páginas ClickFix
+- Contexto de iframe, fullscreen e interação recente
+
+Nenhum comando é executado pelo conteúdo analisado. Os sinais são combinados em uma pontuação heurística; o primeiro token executável sozinho não determina o bloqueio.
+
+## Modos de proteção
+
+| Modo | Comportamento |
+| --- | --- |
+| **Bloquear** | Suspende a gravação ou colagem suspeita até uma decisão explícita do usuário |
+| **Só avisar** | Permite a ação e exibe um aviso localizado |
+
+No modo padrão, o usuário pode escolher **Manter bloqueado** ou **Colar mesmo assim**. Esc mantém o bloqueio.
+
+## Instalação para desenvolvimento
+
+### Pré-requisitos
+
+- Node.js 18 ou superior
+- Microsoft Edge/Chromium ou Firefox para testes E2E
+
+Instale as dependências e gere os pacotes:
+
+```bash
+npm install
+npm run build
+```
+
+### Chromium, Brave, Opera, Vivaldi e Microsoft Edge
+
+1. Abra `chrome://extensions` ou `edge://extensions`
+2. Ative **Modo do desenvolvedor**
+3. Clique em **Carregar sem compactação**
+4. Selecione a pasta `dist/chromium`
+
+### Firefox
+
+1. Abra `about:debugging#/runtime/this-firefox`
+2. Clique em **Carregar extensão temporária**
+3. Selecione `dist/firefox/manifest.json`
+
+O Firefox requer a versão 128 ou superior.
+
+## Página de demonstração
+
+Sirva o diretório localmente e abra a página de demonstração:
+
+```bash
+npx serve .
+```
+
+Depois, acesse a página em uma origem segura, por exemplo:
+
+```text
+http://localhost:3000/test/pages/clickfix-demo.html
+```
+
+Os exemplos são payloads simulados e neutralizados. A demonstração não executa os comandos exibidos.
+
+## Comandos disponíveis
+
+| Comando | Descrição |
+| --- | --- |
+| `npm test` | Executa os testes unitários e de privacidade |
+| `npm run eval` | Avalia os corpora, evasões e gera `reports/SUMMARY.md` |
+| `npm run e2e` | Executa os cenários E2E no Edge/Chromium |
+| `npm run e2e:firefox` | Executa os cenários E2E no Firefox |
+| `npm run build` | Gera as distribuições Chromium e Firefox |
+| `npm run lint:firefox` | Valida o pacote Firefox com `web-ext` |
+| `npm run perf` | Mede o tempo de classificação local |
+| `npm run import-local -- <arquivo>` | Importa dados locais exportados pelas opções |
+| `npm run generate:corpus` | Regenera os corpora neutralizados |
 
 ## Privacidade
 
-O texto integral não é persistido nem enviado à rede. A detecção mantém temporariamente em memória hash SHA-256, origem, nível e motivos; o texto só permanece em memória enquanto uma confirmação de colagem está pendente. Um preview de até 80 caracteres só é enviado ao diálogo de confirmação. A medição local é opcional e desligada por padrão; quando ativada, armazena em `chrome.storage.local` apenas nível, motivos e data agrupados pela origem.
+- Não usa chamadas de rede nem armazenamento remoto
+- O texto bruto não é enviado ou persistido
+- Durante o aviso, o texto retido permanece em memória até o usuário decidir
+- O preview exibido é limitado
+- Métricas locais são opcionais e desligadas por padrão
+- Quando ativadas, usam nível, origem, motivos e data — sem texto ou preview
+- Os relatórios de diagnóstico não incluem os textos das amostras
+
+Detalhes em [`reports/privacy.md`](reports/privacy.md).
+
+## Apoie o projeto
+
+Gostou do Clip Guard? Apoie o projeto: https://buymeacoffee.com/miguelcost3
+
+## Validação
+
+Os resultados registrados localmente incluem:
+
+- **Unitários:** 32/32
+- **Chromium:** 56/56
+- **Firefox:** 24/24
+- **Falsos positivos no corpus combinado:** 0/175
+- **Payloads simulados detectados:** 79/79
+
+Esses números representam os cenários testados nesta versão. Outras versões de navegador e ambientes podem apresentar resultados diferentes.
+
+Relatórios disponíveis:
+
+- [`reports/SUMMARY.md`](reports/SUMMARY.md) — resumo da avaliação
+- [`reports/evasion.md`](reports/evasion.md) — resistência a mutações
+- [`reports/e2e.md`](reports/e2e.md) — cenários Chromium
+- [`reports/firefox-e2e.md`](reports/firefox-e2e.md) — cenários Firefox
+- [`reports/holdout.md`](reports/holdout.md) — comparação com corpus reservado
+- [`reports/perf.md`](reports/perf.md) — medidas locais de desempenho
+- [`reports/privacy.md`](reports/privacy.md) — dados tratados pela extensão
 
 ## Limitações conhecidas
 
-- A extensão não vê colagens fora do navegador, como no diálogo Executar do Windows (`Win+R`) ou em terminais externos.
-- Não cobre todas as formas de escrita no clipboard, páginas especiais/restritas do navegador, escritas iniciadas em workers, contextos sem permissão ou todas as APIs/métodos que contornem os hooks.
-- O alerta de colagem depende de a página ainda estar aberta e de o texto colado corresponder ao último conteúdo suspeito observado pelo hook.
-- Uma extensão MV3 não tem canal secreto entre os mundos MAIN e ISOLATED: a página pode forjar mensagens da ponte e provocar alertas falsos, mas não consegue suprimi-los por essa ponte.
-- Classificação heurística pode gerar falsos positivos e falsos negativos. O protótipo não substitui controles do sistema operacional nem análise de segurança. Expressões de variável dinâmica seguem como evasão não detectada no corpus medido.
-- O conteúdo `-enc` maior que 64 KiB decodificados não é inspecionado.
-- A re-inserção após confirmação usa `setRangeText` para inputs/textarea e `execCommand("insertText")` para conteúdo editável; comportamentos especiais de alguns editores não são garantidos.
-- O teste e2e depende de um Chromium automatizável e Playwright/Puppeteer. O teste unitário e o build não exigem navegador.
+- Não observa colagens feitas fora do navegador, como no diálogo Executar do Windows
+- Não analisa arquivos ou formatos binários em operações de drag-and-drop
+- O `beforeinput` depende de o navegador fornecer texto ou `dataTransfer`
+- Expressões de variável dinâmica continuam fora da cobertura medida
+- Páginas especiais ou restritas podem limitar os hooks da extensão
+- Cópias iniciadas por aplicações externas ao navegador não são observáveis
+- O Firefox não injeta content scripts em iframes vazios `about:blank` no `document_start`
+- Extensões MV3 não possuem um canal secreto entre os mundos MAIN e ISOLATED
+- Comandos construídos dinamicamente ou scripts complexos podem não ser reconstruídos
+
+## Estrutura do projeto
+
+```text
+src/                 classificação, background, bridge e interface
+build/               manifestos base por navegador
+test/                testes unitários, corpora e página de demonstração
+scripts/             build, avaliação, E2E e geração de relatórios
+reports/             resultados gerados localmente
+dist/                pacotes e fontes geradas
+_locales/            traduções da interface
+```
+
+## Desenvolvimento
+
+O fluxo recomendado é:
+
+```bash
+npm test
+npm run eval
+npm run build
+npm run e2e
+npm run e2e:firefox
+npm run lint:firefox
+```
+
+Os pacotes gerados em `dist/` e os relatórios em `reports/` são artefatos locais. Os corpora reais podem ser importados em `test/corpus/`, mas os arquivos `real-*.json` são ignorados pelo Git.

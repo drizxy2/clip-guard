@@ -20,8 +20,21 @@ As taxas antes/depois usam as mesmas mutações e o classificador congelado em `
 | shortened URL | 25/25 (100.00%) | 25/25 (100.00%) |
 | decimal IP URL | 25/25 (100.00%) | 25/25 (100.00%) |
 | hex IP URL | 25/25 (100.00%) | 25/25 (100.00%) |
+| ClickFix cmd/curl.exe | 0/7 (0.00%) | 7/7 (100.00%) |
 
 ## Limitações conhecidas
 
 - variable expression: 1/1 amostras indetectáveis após o ajuste.
 A construção dinâmica de variáveis que não pertence às mutações obrigatórias continua fora do escopo de reconstrução sem executar o comando.
+
+## Evasões de primeiro token
+
+Comparação com os níveis registrados em `reports/first-token-baseline.md` antes da alteração.
+
+| Caso | Antes | Depois |
+| --- | --- | --- |
+| sem prefixo | high | high |
+| prefixo isca (set/echo/cd) | high | high |
+| espaços + aspas + @/& | none | low |
+| comentário REM antes do comando | high | high |
+| nova linha inicial | high | high |

@@ -1,6 +1,6 @@
 # Resultados dos cenários E2E
 
-Executado em 2026-11-12T13:40:09.943Z com Playwright e Microsoft Edge. Resultado: 21/21 passaram.
+Executado em 2026-11-23T04:15:34.506Z com Playwright e Microsoft Edge. Resultado: 22/22 passaram.
 
 | Cenário | Resultado | Observação |
 | --- | --- | --- |
@@ -23,5 +23,6 @@ Executado em 2026-11-12T13:40:09.943Z com Playwright e Microsoft Edge. Resultado
 | Colagem em shadow: Colar mesmo assim reinsere o texto exato | PASSOU |  |
 | Colagem em shadow: Cancelar mantém o campo intacto | PASSOU |  |
 | Medição local desativada por padrão | PASSOU |  |
+| Confirmação benigna sem persistir texto/evento | PASSOU |  |
 | Medição por origem e exportação JSON sem texto | PASSOU |  |
 | Botão legítimo Copiar npm install lodash sem alerta | PASSOU |  |

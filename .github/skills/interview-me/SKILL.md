@@ -1,0 +1,172 @@
+---
+name: interview-me
+license: MIT
+description: >
+  Use when a request is underspecified and you need to discover what the user actually
+  wants before writing a plan, spec, or code - default to one question at a time when
+  later questions depend on earlier answers, switch to a numbered batch only for
+  independent high-latency clarifications, attach your current hypothesis, and stop
+  only after the intent is explicitly confirmed.
+metadata:
+  category: workflow
+  agent_type: general-purpose
+  origin: adapted from addyosmani/agent-skills interview-me
+---
+
+# Interview Me
+
+Interview Me is for intent discovery before work starts. It is the step before a spec,
+plan, or implementation, when the user's first ask may still be a proxy for the real
+goal.
+
+Unlike `grill-me`, which stress-tests an existing plan through dialogue, Interview Me is for
+gathering missing intent from the requester and can produce a questionnaire-style batch when
+interactive back-and-forth would be too slow.
+
+## When to Use
+
+- The request is missing who, why, success criteria, constraints, or non-goals
+- The user asked for a conventional artifact ("build a dashboard", "make it faster")
+  without saying what problem that artifact solves
+- You notice yourself filling in assumptions before any plan exists
+- The user explicitly asks to be interviewed, challenged, or stress-tested before starting
+
+## When NOT to Use
+
+| Instead of interview-me | Use |
+|-------------------------|-----|
+| The request is already clear and self-contained | do the task |
+| The user's intent is already clear, but an existing plan or spec now needs its assumptions pressure-tested | `grill-me` |
+| The work is really about choosing Copilot mode, tools, or delegation path rather than discovering the user's desired outcome | `task-intake-router` |
+| The user asked a factual or explanatory question | answer directly |
+
+## Loading Constraint
+
+This skill needs an answerable user, but not always a live turn-by-turn exchange. If interactive
+back-and-forth is impractical, convert only the mutually independent unresolved questions into a
+questionnaire the requester can answer asynchronously. Do not invoke it when there is no
+responsible person who can answer.
+
+## Workflow
+
+### 1. State your hypothesis and confidence
+
+Before asking anything, write down:
+
+- your best current read of what the user wants
+- a confidence number from 0 to 100
+
+If the number feels high but you cannot predict the next few answers, the number is too high.
+
+### 2. Default to linear questioning; batch only independent clarifications
+
+Choose the mode before each round:
+
+- **Linear mode (default):** use when one answer changes what you should ask next. Ask one focused
+  question at a time and resolve it before proceeding.
+- **Batch mode:** use only when several questions are mutually independent and the extra
+  round-trip cost is high enough that asking them together will materially save time. Present the
+  whole ready set in one numbered round, with one idea per question and your current hypothesis
+  attached to each.
+
+Every question should include:
+
+- one focused question
+- your current guess for the answer
+- the reasoning behind that guess
+
+Do not batch dependent questions. When you switch to batch mode, order the questions by importance,
+group related topics together, and end with a catch-all or deadline item if the answers are being
+collected asynchronously. Return to linear mode as soon as later questions depend on earlier
+answers.
+
+### 3. Listen for "want" vs "should want"
+
+Probe when the user answers with:
+
+- best-practice slogans
+- vague quality words like "scalable" or "robust"
+- conventional artifacts instead of outcomes
+
+Useful probe:
+
+> If you did not have to justify this to anyone, what would you actually want?
+
+### 4. Restate the intent in a structured form
+
+When confidence is high enough, write back:
+
+- Outcome
+- User
+- Why now
+- Success
+- Constraint
+- Out of scope
+
+Out of scope is required. Many mismatches hide there.
+
+### 5. Get an explicit yes
+
+These do **not** count as confirmation:
+
+- "whatever you think"
+- "sounds good"
+- silence followed by "let's start"
+
+Keep refining until the user explicitly confirms the restated intent.
+
+### 6. Stop when the intent is predictable
+
+You are done when you can reasonably predict the user's reaction to the next few
+questions you would ask.
+
+Then hand off to the next skill:
+
+- `create-prd` if the intent needs a product spec
+- `grill-me` if a plan now exists but needs stress-testing
+- direct implementation if the ask is now clear and bounded
+
+## Output Template
+
+```markdown
+## Confirmed Intent
+
+- Outcome: ...
+- User: ...
+- Why now: ...
+- Success: ...
+- Constraint: ...
+- Out of scope: ...
+
+Confirmed by user: Yes
+```
+
+## Common Rationalizations
+
+| Rationalization | Reality |
+|----------------|---------|
+| "The ask is clear enough." | If you still need to guess the outcome, it is not clear enough. |
+| "Questions will slow things down." | Building the wrong thing costs far more than 3 to 6 targeted questions. |
+| "I'll discover the real goal while implementing." | That turns cheap clarification into expensive rework. |
+
+## Red Flags
+
+- Three or more questions in one message outside batch mode, or any batch containing dependent questions
+- Questions without your current guess attached
+- Producing a plan or spec before confirmation
+- Skipping the out-of-scope line in the restatement
+
+## Verification
+
+- [ ] The first turn included a hypothesis and confidence number
+- [ ] Linear mode was used for dependent questions, and batch mode only for truly independent
+      clarifications
+- [ ] At least one probe tested for "want" vs "should want" when needed
+- [ ] The restated intent included outcome, user, why now, success, constraint, and out of scope
+- [ ] The user explicitly confirmed the restatement
+
+## See Also
+
+- [`grill-me`](../grill-me/SKILL.md) - pressure-test a plan that already exists
+- [`task-intake-router`](../../copilot-exclusive/task-intake-router/SKILL.md) - route work to the right Copilot execution mode
+- [`create-prd`](../../product/create-prd/SKILL.md) - turn confirmed intent into a product requirements document
