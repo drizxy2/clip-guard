@@ -410,6 +410,26 @@ import { classify } from "./classifier.js";
         }));
         element.dispatchEvent(new win.Event("change", { bubbles: true }));
       };
+      const isEditable = (element) =>
+        Boolean(element && (
+          element.isContentEditable ||
+          element.getAttribute?.("contenteditable") === "true" ||
+          element.getAttribute?.("contenteditable") === "" ||
+          element.closest?.("[contenteditable='true'],[contenteditable='']")
+        ));
+      const composedTarget = (eventTarget) => {
+        if (isEditable(eventTarget)) return eventTarget;
+        try {
+          for (const node of eventTarget?.composedPath?.() || []) {
+            if (node instanceof win.Element && isEditable(node)) return node;
+          }
+        } catch {}
+        const active = win.document.activeElement;
+        if (isEditable(active)) return active;
+        return eventTarget;
+      };
+      target = target?.isConnected ? target : composedTarget(target);
+      if (target?.isConnected === false) target = null;
       if (target instanceof win.HTMLInputElement || target instanceof win.HTMLTextAreaElement) {
         if (target.disabled || target.readOnly) return;
         target.focus();
@@ -417,26 +437,74 @@ import { classify } from "./classifier.js";
         dispatch(target);
         return;
       }
-      if (target?.isContentEditable || target?.closest?.("[contenteditable='true']")) {
+      if (isEditable(target)) {
         target.focus?.();
         if (selection.range) {
           const range = selection.range;
-          range.deleteContents();
-          const inserted = win.document.createTextNode(text);
-          range.insertNode(inserted);
-          range.setStartAfter(inserted);
-          range.collapse(true);
-          const current = win.getSelection();
-          current.removeAllRanges();
-          current.addRange(range);
+          try {
+            if (range.commonAncestorContainer?.isConnected) {
+              range.deleteContents();
+              const inserted = win.document.createTextNode(text);
+              range.insertNode(inserted);
+              range.setStartAfter(inserted);
+              range.collapse(true);
+              const current = win.getSelection();
+              if (current) {
+                current.removeAllRanges();
+                current.addRange(range);
+              }
+              dispatch(target);
+              return;
+            }
+          } catch {}
+        }
+        if (target.isConnected) {
+          const selected = win.getSelection();
+          if (selected?.rangeCount) {
+            const range = selected.getRangeAt(0);
+            try {
+              range.deleteContents();
+              const inserted = win.document.createTextNode(text);
+              range.insertNode(inserted);
+              range.setStartAfter(inserted);
+              range.collapse(true);
+              dispatch(target);
+              return;
+            } catch {}
+          }
+          const last = target.lastChild;
+          if (last) {
+            const range = win.document.createRange();
+            range.setStartAfter(last);
+            range.collapse(true);
+            range.insertNode(win.document.createTextNode(text));
+          } else {
+            target.append(win.document.createTextNode(text));
+          }
           dispatch(target);
           return;
         }
-        win.document.execCommand("insertText", false, text);
-        dispatch(target);
-        return;
       }
       win.document.execCommand("insertText", false, text);
+    }
+
+    function resolvePasteTarget(event) {
+      const path = typeof event?.composedPath === "function" ? event.composedPath() : [];
+      for (const node of path) {
+        if (node instanceof win.HTMLInputElement || node instanceof win.HTMLTextAreaElement) return node;
+        if (node instanceof win.Element &&
+            (node.isContentEditable ||
+             node.getAttribute?.("contenteditable") === "true" ||
+             node.getAttribute?.("contenteditable") === "" ||
+             node.closest?.("[contenteditable='true'],[contenteditable='']"))) return node;
+      }
+      const target = event?.target;
+      if (target instanceof win.HTMLInputElement || target instanceof win.HTMLTextAreaElement) return target;
+      if (target?.isContentEditable ||
+          target?.getAttribute?.("contenteditable") === "true" ||
+          target?.getAttribute?.("contenteditable") === "" ||
+          target?.closest?.("[contenteditable='true'],[contenteditable='']")) return target;
+      return target;
     }
 
     function textFromTransfer(transfer) {
@@ -486,13 +554,16 @@ import { classify } from "./classifier.js";
 
       event.preventDefault();
       event.stopImmediatePropagation();
-      const target = event.target;
+      const target = resolvePasteTarget(event);
       const selection = {
         start: Number.isInteger(target?.selectionStart) ? target.selectionStart : 0,
         end: Number.isInteger(target?.selectionEnd) ? target.selectionEnd : 0,
         range: null
       };
-      if (target?.isContentEditable || target?.closest?.("[contenteditable='true']")) {
+      if (target?.isContentEditable ||
+          target?.getAttribute?.("contenteditable") === "true" ||
+          target?.getAttribute?.("contenteditable") === "" ||
+          target?.closest?.("[contenteditable='true'],[contenteditable='']")) {
         const selected = win.getSelection();
         if (selected?.rangeCount) selection.range = selected.getRangeAt(0).cloneRange();
       }

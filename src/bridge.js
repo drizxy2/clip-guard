@@ -4,6 +4,7 @@ import { createUI } from "./ui.js";
   "use strict";
 
   const api = globalThis.clipGuardApi;
+  const contextHealth = globalThis.clipGuardContextHealth;
   const PREFIX = "__clip_guard__";
   const ui = createUI();
   let channel = null;
@@ -25,26 +26,35 @@ import { createUI } from "./ui.js";
     } catch {}
   }
 
+  function getLocal(keys) {
+    return contextHealth.call(() => api.storage.local.get(keys), {});
+  }
+
+  function setLocal(values) {
+    return contextHealth.call(() => api.storage.local.set(values));
+  }
+
   function getTrustedOrigins() {
-    return api.storage.local.get(trustedOriginsKey).then((value) =>
+    return getLocal(trustedOriginsKey).then((value) =>
       Array.isArray(value[trustedOriginsKey]) ? value[trustedOriginsKey] : []
     );
   }
 
   function notifyBackground() {
-    try {
-      const response = api.runtime.sendMessage({ type: "CLIP_GUARD_ALERT" });
-      response?.catch?.(() => {});
-    } catch {}
+    contextHealth.call(() =>
+      api.runtime.sendMessage({ type: "CLIP_GUARD_ALERT" })
+    ).catch(() => {});
   }
 
   async function applyProtectionMode() {
     try {
-      const values = await api.storage.local.get(protectionModeKey);
+      const values = await getLocal(protectionModeKey);
+      if (!contextHealth.isHealthy()) return;
       send("SETTINGS", {
         protectionMode: values[protectionModeKey] === "warn" ? "warn" : "block"
       });
     } catch (error) {
+      if (contextHealth.isInvalidated()) return;
       console.error("Clip Guard: falha ao carregar o modo de proteção.", error);
       send("SETTINGS", { protectionMode: "block" });
     }
@@ -66,17 +76,14 @@ import { createUI } from "./ui.js";
         : [],
       time: Number.isFinite(diagnostic.time) ? diagnostic.time : Date.now()
     };
-    try {
-      const response = api.runtime.sendMessage({
-        type: "CLIP_GUARD_WRITE_DIAGNOSTIC",
-        diagnostic: safeDiagnostic
-      });
-      response?.catch?.((error) => {
+    contextHealth.call(() => api.runtime.sendMessage({
+      type: "CLIP_GUARD_WRITE_DIAGNOSTIC",
+      diagnostic: safeDiagnostic
+    })).catch((error) => {
+      if (!contextHealth.isInvalidated()) {
         console.error("Clip Guard: falha ao encaminhar diagnóstico de escrita.", error);
-      });
-    } catch (error) {
-      console.error("Clip Guard: falha ao encaminhar diagnóstico de escrita.", error);
-    }
+      }
+    });
   }
 
   function clearClipboard() {
@@ -88,7 +95,7 @@ import { createUI } from "./ui.js";
   function trustOrigin(origin) {
     return getTrustedOrigins().then((origins) => {
       const updated = [...new Set([...origins, origin])];
-      return api.storage.local.set({ [trustedOriginsKey]: updated });
+      return setLocal({ [trustedOriginsKey]: updated });
     });
   }
 
@@ -101,7 +108,7 @@ import { createUI } from "./ui.js";
         : [],
       date: new Date(Number.isFinite(alert.time) ? alert.time : Date.now()).toISOString()
     };
-    api.storage.local.get([measurementEnabledKey, measurementLogKey]).then((values) => {
+    getLocal([measurementEnabledKey, measurementLogKey]).then((values) => {
       if (values[measurementEnabledKey] !== true) return;
       const log = values[measurementLogKey] &&
         typeof values[measurementLogKey] === "object"
@@ -115,9 +122,11 @@ import { createUI } from "./ui.js";
       );
       if (duplicate) return;
       log[origin] = [...entries, entry];
-      return api.storage.local.set({ [measurementLogKey]: log });
+      return setLocal({ [measurementLogKey]: log });
     }).catch((error) => {
-      console.error("Clip Guard: falha ao salvar medição local.", error);
+      if (!contextHealth.isInvalidated()) {
+        console.error("Clip Guard: falha ao salvar medição local.", error);
+      }
     });
   }
 
@@ -179,10 +188,12 @@ import { createUI } from "./ui.js";
   }
 
   function showFreeConfirmation(kind) {
-    api.storage.local.get(freeConfirmationsKey).then((values) => {
+    getLocal(freeConfirmationsKey).then((values) => {
       if (values[freeConfirmationsKey] !== false) ui.showFreeConfirmation(kind);
     }).catch((error) => {
-      console.error("Clip Guard: falha ao carregar a opção de confirmações livres.", error);
+      if (!contextHealth.isInvalidated()) {
+        console.error("Clip Guard: falha ao carregar a opção de confirmações livres.", error);
+      }
     });
   }
 
@@ -201,6 +212,7 @@ import { createUI } from "./ui.js";
   }
 
   window.addEventListener("message", (event) => {
+    if (!contextHealth.isHealthy()) return;
     const message = event.data;
     if (!message || typeof message !== "object") return;
     if (typeof message.id === "string" && [
@@ -320,7 +332,7 @@ import { createUI } from "./ui.js";
       return;
     }
   });
-  api.storage.onChanged.addListener((changes, areaName) => {
+  contextHealth.listen(() => api.storage.onChanged, (changes, areaName) => {
     if (areaName !== "local" || !changes[protectionModeKey]) return;
     send("SETTINGS", {
       protectionMode: changes[protectionModeKey].newValue === "warn" ? "warn" : "block"

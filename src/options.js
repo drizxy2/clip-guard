@@ -1,6 +1,7 @@
 import { isRightToLeft, message, translateMethod, translateReason } from "./i18n.js";
 
 const api = globalThis.clipGuardApi;
+const contextHealth = globalThis.clipGuardContextHealth;
 const enabledKey = "fpMeasurementEnabled";
 const logKey = "fpMeasurementLog";
 const diagnosticsKey = "writeDiagnostics";
@@ -15,6 +16,14 @@ const diagnosticsBody = document.querySelector("#write-diagnostics");
 const exportButton = document.querySelector("#export");
 let measurementLog = {};
 let writeDiagnostics = {};
+
+function getLocal(keys) {
+  return contextHealth.call(() => api.storage.local.get(keys), {});
+}
+
+function setLocal(values) {
+  return contextHealth.call(() => api.storage.local.set(values));
+}
 
 function t(key, substitutions) {
   return message((name, args) => api.i18n.getMessage(name, args), key, substitutions);
@@ -86,7 +95,7 @@ function render() {
 }
 
 async function loadOptions() {
-  const values = await api.storage.local.get([
+  const values = await getLocal([
     enabledKey,
     logKey,
     diagnosticsKey,
@@ -108,9 +117,11 @@ async function loadOptions() {
 protectionMode.addEventListener("change", async () => {
   protectionMode.disabled = true;
   try {
-    await api.storage.local.set({ [protectionModeKey]: protectionMode.value });
+    await setLocal({ [protectionModeKey]: protectionMode.value });
+    if (!contextHealth.isHealthy()) return;
     status.textContent = t("saveModeSuccess");
   } catch (error) {
+    if (contextHealth.isInvalidated()) return;
     protectionMode.value = protectionMode.value === "warn" ? "block" : "warn";
     status.textContent = t("saveError", error.message);
   } finally {
@@ -121,9 +132,11 @@ protectionMode.addEventListener("change", async () => {
 checkbox.addEventListener("change", async () => {
   checkbox.disabled = true;
   try {
-    await api.storage.local.set({ [enabledKey]: checkbox.checked });
+    await setLocal({ [enabledKey]: checkbox.checked });
+    if (!contextHealth.isHealthy()) return;
     status.textContent = t(checkbox.checked ? "saveMeasurementOn" : "saveMeasurementOff");
   } catch (error) {
+    if (contextHealth.isInvalidated()) return;
     checkbox.checked = !checkbox.checked;
     status.textContent = t("saveError", error.message);
   } finally {
@@ -134,9 +147,11 @@ checkbox.addEventListener("change", async () => {
 freeConfirmations.addEventListener("change", async () => {
   freeConfirmations.disabled = true;
   try {
-    await api.storage.local.set({ [freeConfirmationsKey]: freeConfirmations.checked });
+    await setLocal({ [freeConfirmationsKey]: freeConfirmations.checked });
+    if (!contextHealth.isHealthy()) return;
     status.textContent = t(freeConfirmations.checked ? "saveToastsOn" : "saveToastsOff");
   } catch (error) {
+    if (contextHealth.isInvalidated()) return;
     freeConfirmations.checked = !freeConfirmations.checked;
     status.textContent = t("saveError", error.message);
   } finally {
@@ -156,7 +171,7 @@ exportButton.addEventListener("click", () => {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 });
 
-api.storage.onChanged.addListener((changes, areaName) => {
+contextHealth.listen(() => api.storage.onChanged, (changes, areaName) => {
   if (areaName !== "local") return;
   if (changes[logKey]) {
     const updatedLog = changes[logKey].newValue;

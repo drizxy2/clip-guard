@@ -3,6 +3,7 @@ import { isRightToLeft, translateMethod, translateReason } from "./i18n.js";
 export function createUI() {
   const api = globalThis.clipGuardApi;
   const host = document.createElement("div");
+  host.setAttribute("data-clip-guard-ui", "true");
   host.dir = isRightToLeft(api.i18n.getUILanguage()) ? "rtl" : "ltr";
   const shadow = host.attachShadow({ mode: "closed" });
   const style = document.createElement("style");
@@ -32,17 +33,37 @@ export function createUI() {
     return value;
   }
 
+  let hostObserver = null;
   function ensureHost() {
     if (host.isConnected) return;
     if (document.documentElement) {
       document.documentElement.append(host);
-      return;
+    } else {
+      document.addEventListener("DOMContentLoaded", () => {
+        document.documentElement?.append(host);
+      }, { once: true });
     }
-    document.addEventListener("DOMContentLoaded", () => {
-      document.documentElement?.append(host);
-    }, { once: true });
+  }
+  function observeHostReattachment() {
+    if (hostObserver) return;
+    if (!globalThis.MutationObserver) return;
+    hostObserver = new MutationObserver((records) => {
+      if (!host.isConnected) ensureHost();
+      for (const record of records) {
+        if (record.removedNodes?.length) {
+          if (!host.isConnected) ensureHost();
+          break;
+        }
+      }
+    });
+    try {
+      hostObserver.observe(document, { childList: true, subtree: true });
+    } catch {
+      hostObserver = null;
+    }
   }
   ensureHost();
+  observeHostReattachment();
 
   function details(alert, title, sourceKey, showPreview = false) {
     const box = document.createElement("div");

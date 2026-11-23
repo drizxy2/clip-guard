@@ -262,6 +262,63 @@ async function testLocale({ label, browserLocale, language }) {
         }
       });
 
+      await record("shadow DOM fechado aninhado permite reinserção exata e Cancel mantém bloqueado", async () => {
+        await page.evaluate(() => {
+          const outer = document.createElement("section");
+          outer.id = "shadow-outer";
+          document.body.append(outer);
+          const outerRoot = outer.attachShadow({ mode: "closed" });
+          const inner = document.createElement("div");
+          outerRoot.append(inner);
+          const innerRoot = inner.attachShadow({ mode: "closed" });
+          const editor = document.createElement("div");
+          editor.id = "nested-editable";
+          editor.contentEditable = "true";
+          innerRoot.append(editor);
+          window.__clipGuardNestedEditor = editor;
+        });
+        const dispatchSuspiciousPaste = async (action) => {
+          await page.evaluate((value) => {
+            const target = window.__clipGuardNestedEditor;
+            target.textContent = "";
+            target.focus();
+            const transfer = new DataTransfer();
+            transfer.setData("text/plain", value);
+            const event = new ClipboardEvent("paste", {
+              clipboardData: transfer,
+              bubbles: true,
+              cancelable: true,
+              composed: true
+            });
+            target.dispatchEvent(event);
+          }, suspicious);
+          await waitForText(page, expected.prompt);
+          await clickShadowButton(page, action);
+        };
+        await dispatchSuspiciousPaste(expected.allow);
+        await page.waitForFunction((text) =>
+          window.__clipGuardNestedEditor?.textContent === text,
+        suspicious);
+        await dispatchSuspiciousPaste(expected.keep);
+        const nestedText = await page.evaluate(() =>
+          window.__clipGuardNestedEditor?.textContent
+        );
+        if (nestedText) throw new Error(`Nested shadow Cancel inserted text: ${nestedText}`);
+      });
+
+      await record("host da UI fechada é reanexado após mudança SPA do DOM", async () => {
+        await page.evaluate(() => {
+          document.querySelector("[data-clip-guard-ui]")?.remove();
+        });
+        await page.waitForTimeout(100);
+        await page.evaluate((text) => navigator.clipboard.writeText(text), benign);
+        await waitForText(page, expected.copy);
+        const hostReattached = await page.evaluate(() =>
+          document.querySelector("[data-clip-guard-ui]")?.isConnected
+        );
+        if (!hostReattached) throw new Error("Closed-shadow UI host was not reattached");
+      });
+
       await record("iframe aninhado produz somente um toast", async () => {
         await page.evaluate((url) => {
           const first = document.createElement("iframe");

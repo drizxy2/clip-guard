@@ -183,6 +183,9 @@ Relatórios disponíveis:
 - O Firefox não injeta content scripts em iframes vazios `about:blank` no `document_start`
 - Extensões MV3 não possuem um canal secreto entre os mundos MAIN e ISOLATED
 - Comandos construídos dinamicamente ou scripts complexos podem não ser reconstruídos
+- Após recarregar ou atualizar a extensão no Chrome/Edge, abas abertas conservam temporariamente
+  um contexto de content script inválido. Atualize a página para restabelecer a ponte; o Clip
+  Guard para novas chamadas à API e não registra esse estado como repetição no console
 
 ## Estrutura do projeto
 
