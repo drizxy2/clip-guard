@@ -127,6 +127,6 @@ Ctrl+C após selecionar texto numa página é diagnosticado pelo conteúdo da se
 
 ## Compatibilidade
 
-Chromium e Edge usam MV3 com service worker; Firefox usa event page (`background.scripts`), ID Gecko `clip-guard@local.example`, mínimo desktop 140.0 e mínimo Android 142.0. `src/compat.js` seleciona `browser` ou `chrome` e fornece `clipGuardApi` a cada contexto da extensão.
+Chromium e Edge usam MV3 com service worker; Firefox usa event page (`background.scripts`), ID Gecko `clip-guard@drizxy2.github.io`, mínimo desktop 140.0 e mínimo Android 142.0. `src/compat.js` seleciona `browser` ou `chrome` e fornece `clipGuardApi` a cada contexto da extensão.
 Firefox 160.0.1: E2E 24/24 em duas suítes, incluindo Ctrl+C manual e localização; Microsoft Edge 157.0.4341.46 (Chromium) E2E 56/56 em três suítes. `world: MAIN`, `all_frames`, `match_about_blank` e `match_origin_as_fallback` são mantidos. Firefox não injeta content scripts em iframes vazios no `document_start`; versões abaixo de 140 ignoram a declaração de dados Gecko. Chromium ignora os metadados Gecko.
 `web-ext lint`: 0 erros, 2 avisos aceitáveis (`KEY_FIREFOX_UNSUPPORTED_BY_MIN_VERSION` para desktop <140 e `KEY_FIREFOX_ANDROID_UNSUPPORTED_BY_MIN_VERSION` para Android <142), pois o mínimo pedido é 128. Publicação AMO e outras versões não foram testadas.

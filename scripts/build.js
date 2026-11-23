@@ -124,7 +124,7 @@ for (const browser of targets) {
     assert(manifest.background.scripts.indexOf("src/compat.js") <
       manifest.background.scripts.indexOf("src/background.js"),
     "Firefox precisa carregar a compatibilidade antes do background");
-    assert(manifest.browser_specific_settings?.gecko?.id === "clip-guard@local.example",
+    assert(manifest.browser_specific_settings?.gecko?.id === "clip-guard@drizxy2.github.io",
       "Firefox precisa do ID Gecko configurado");
     assert(manifest.browser_specific_settings.gecko.strict_min_version === "140.0",
       "Firefox Desktop precisa da versão mínima 140.0");
