@@ -11,12 +11,12 @@ O projeto oferece interceptação para navegadores baseados em Chromium e Firefo
 | Navegador | Status | Observações |
 | --- | --- | --- |
 | Microsoft Edge (Chromium) | Testado | Testes E2E automatizados neste navegador; a versão registrada é 157.0.4341.46. |
-| Firefox Desktop 160.0.1 | Testado | Testes E2E automatizados; 128.0 é o mínimo declarado, mas versões anteriores à testada não foram verificadas. |
+| Firefox Desktop 160.0.1 | Testado | Testes E2E automatizados; mínimo declarado 140.0. |
 | Chrome / Chromium | Esperado funcionar, não testado | Usa o manifesto Chromium MV3; a execução E2E disponível neste projeto usa Edge. |
 | Brave, Opera e Vivaldi | Esperado funcionar, não testado | Baseados em Chromium; não foram testados individualmente. |
 | Safari | Suporte experimental, não testado | Requer macOS + Xcode e conversão da Web Extension; veja os passos abaixo. |
 | Chrome para Android | Não suportado | Chrome para Android não oferece suporte a extensões. |
-| Firefox para Android | Esperado funcionar, não testado | A plataforma pode oferecer suporte a extensões, mas este projeto não foi testado nela. |
+| Firefox para Android | Esperado funcionar, não testado | Mínimo declarado 142.0; esta plataforma não foi testada. |
 
 Extensões não são executadas em páginas restritas do navegador, como `chrome://`, `edge://`, `about:` ou páginas de extensões. No Firefox, frames vazios `about:blank` podem não receber os scripts no início do documento. A extensão só observa operações de clipboard ocorridas dentro de páginas às quais os content scripts têm acesso; colagens em outros aplicativos ou fora do navegador não são detectáveis.
 
@@ -98,7 +98,7 @@ npm run build
 
 As instruções de carregamento são as mesmas acima; use a pasta `dist/chromium` para navegadores Chromium e `dist/firefox/manifest.json` para Firefox.
 
-O Firefox requer a versão 128 ou superior.
+O Firefox Desktop requer a versão 140 ou superior. No Android, o mínimo declarado é 142; essa plataforma não foi testada.
 
 ## Página de demonstração
 

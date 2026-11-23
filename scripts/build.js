@@ -126,8 +126,10 @@ for (const browser of targets) {
     "Firefox precisa carregar a compatibilidade antes do background");
     assert(manifest.browser_specific_settings?.gecko?.id === "clip-guard@local.example",
       "Firefox precisa do ID Gecko configurado");
-    assert(manifest.browser_specific_settings.gecko.strict_min_version === "128.0",
-      "Firefox precisa da versão mínima 128.0");
+    assert(manifest.browser_specific_settings.gecko.strict_min_version === "140.0",
+      "Firefox Desktop precisa da versão mínima 140.0");
+    assert(manifest.browser_specific_settings.gecko_android?.strict_min_version === "142.0",
+      "Firefox para Android precisa da versão mínima 142.0");
   }
 
   const output = path.join(dist, browser);
