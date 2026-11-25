@@ -1,6 +1,6 @@
 # Clipboard and localization E2E (Firefox)
 
-Result: 18/18 scenarios passed.
+Result: 18/18 executed scenarios passed; 0 not run.
 
 | Scenario | Result | Note |
 | --- | --- | --- |

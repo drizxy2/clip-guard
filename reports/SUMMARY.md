@@ -1,6 +1,6 @@
 # Resumo de avaliação do Clip Guard
 
-Gerado em 2026-11-23T04:15:38.065Z por `npm run eval`. As métricas usam o classificador atual, sem ajustar suas regras.
+Gerado em 2026-11-25T21:29:03.605Z por `npm run eval`. As métricas usam o classificador atual, sem ajustar suas regras.
 
 ## Dev
 
@@ -111,13 +111,13 @@ Resultado: 22/22 passaram.
 
 ## Desempenho
 
-Executado em 2026-11-23T04:15:37.977Z com Node.js v24.21.0; medidas locais, 5000/1000/300 iterações (100 caracteres/10 KiB/1 MiB).
+Executado em 2026-11-25T21:29:03.474Z com Node.js v24.21.0; medidas locais, 5000/1000/300 iterações (100 caracteres/10 KiB/1 MiB).
 Para entradas acima de 100 KiB, `classify()` examina somente os primeiros e últimos 50 KiB.
 | Tamanho | Média (ms) | p99 (ms) |
 | --- | ---: | ---: |
-| 100 caracteres | 0.0115 | 0.0754 |
-| 10,240 caracteres | 0.6246 | 1.0092 |
-| 1,048,576 caracteres | 7.5691 | 14.9918 |
+| 100 caracteres | 0.0140 | 0.0965 |
+| 10,240 caracteres | 0.6812 | 1.1882 |
+| 1,048,576 caracteres | 7.5903 | 10.4937 |
 
 ## Amostras reais
 
@@ -127,6 +127,6 @@ Ctrl+C após selecionar texto numa página é diagnosticado pelo conteúdo da se
 
 ## Compatibilidade
 
-Chromium e Edge usam MV3 com service worker; Firefox usa event page (`background.scripts`), ID Gecko `clip-guard@drizxy2.github.io`, mínimo desktop 140.0 e mínimo Android 142.0. `src/compat.js` seleciona `browser` ou `chrome` e fornece `clipGuardApi` a cada contexto da extensão.
-Firefox 160.0.1: E2E 24/24 em duas suítes, incluindo Ctrl+C manual e localização; Microsoft Edge 157.0.4341.46 (Chromium) E2E 56/56 em três suítes. `world: MAIN`, `all_frames`, `match_about_blank` e `match_origin_as_fallback` são mantidos. Firefox não injeta content scripts em iframes vazios no `document_start`; versões abaixo de 140 ignoram a declaração de dados Gecko. Chromium ignora os metadados Gecko.
-`web-ext lint`: 0 erros, 2 avisos aceitáveis (`KEY_FIREFOX_UNSUPPORTED_BY_MIN_VERSION` para desktop <140 e `KEY_FIREFOX_ANDROID_UNSUPPORTED_BY_MIN_VERSION` para Android <142), pois o mínimo pedido é 128. Publicação AMO e outras versões não foram testadas.
+Chromium e Edge usam MV3 com service worker; Firefox usa event page (`background.scripts`), ID Gecko `clip-guard@drizxy2.github.io`, mínimo desktop 128.0 e mínimo Android 142.0. `src/compat.js` seleciona `browser` ou `chrome` e fornece `clipGuardApi` a cada contexto da extensão.
+Firefox 160.0.1: E2E 24/24 em duas suítes, incluindo localização espanhola com o pacote oficial de idioma es-ES do Firefox 160. Microsoft Edge 158.0.4370.33 (Chromium): E2E 58/58 em três suítes. `world: MAIN`, `all_frames`, `match_about_blank` e `match_origin_as_fallback` são mantidos. Firefox não injeta content scripts em iframes vazios no `document_start`; versões abaixo de 140 ignoram a declaração de dados Gecko. Chromium ignora os metadados Gecko.
+`web-ext lint`: 0 erros e 1 aviso (`KEY_FIREFOX_UNSUPPORTED_BY_MIN_VERSION`), pois `strict_min_version` 128.0 antecede o suporte ao campo Gecko de coleta de dados. Publicação AMO e outras versões não foram testadas.

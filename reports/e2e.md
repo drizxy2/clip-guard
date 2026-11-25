@@ -1,6 +1,6 @@
 # Resultados dos cenários E2E
 
-Executado em 2026-11-23T04:15:34.506Z com Playwright e Microsoft Edge. Resultado: 22/22 passaram.
+Executado em 2026-11-25T21:28:59.921Z com Playwright e Microsoft Edge. Resultado: 22/22 passaram.
 
 | Cenário | Resultado | Observação |
 | --- | --- | --- |

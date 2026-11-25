@@ -453,7 +453,7 @@ try {
   await testLocale({ label: "pt-BR", browserLocale: "pt-BR", language: "pt" });
   await testLocale({ label: "en-US", browserLocale: "en-US", language: "en" });
   await testLocale({ label: "es", browserLocale: "es", language: "es" });
-  await testLocale({ label: "fallback fr-FR", browserLocale: "fr-FR", language: "en" });
+  await testLocale({ label: "fallback it-IT", browserLocale: "it-IT", language: "en" });
 } finally {
   await new Promise((resolve) => server.close(resolve));
 }

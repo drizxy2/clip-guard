@@ -57,6 +57,7 @@ const server = createServer((_request, response) => {
   response.end(pageHtml);
 });
 const outcomes = [];
+const notRun = [];
 let geckodriver;
 
 async function record(name, action) {
@@ -117,10 +118,24 @@ async function setValue(driver, selector, value) {
 }
 
 async function runLocale(locale) {
+  const languagePack = locale === "es" ? process.env.FIREFOX_ES_LANGPACK : null;
+  if (locale === "es" && !languagePack) {
+    notRun.push(...[
+      "confirmação de cópia benigna",
+      "colagem benigna entra no campo",
+      "bloquear mantém vazio; permitir reinsere texto",
+      "modo só avisar permite a colagem suspeita",
+      "textarea e contenteditable permanecem bloqueados com Escape",
+      "iframe benigno gera toast somente no documento superior"
+    ].map((scenario) => ({
+      name: `es: ${scenario}`,
+      note: "NOT RUN: FIREFOX_ES_LANGPACK não está definido; sem o pacote de idioma espanhol, Firefox usa outra localização."
+    })));
+    return;
+  }
   let driver;
   let profilePath;
   try {
-    const languagePack = locale === "es" ? process.env.FIREFOX_ES_LANGPACK : null;
     if (languagePack) {
       profilePath = await mkdtemp(path.join(os.tmpdir(), "clip-guard-firefox-locale-"));
       const extensionsPath = path.join(profilePath, "extensions");
@@ -291,15 +306,16 @@ const passed = outcomes.filter(({ passed: result }) => result).length;
 const report = [
   "# Clipboard and localization E2E (Firefox)",
   "",
-  `Result: ${passed}/${outcomes.length} scenarios passed.`,
+  `Result: ${passed}/${outcomes.length} executed scenarios passed; ${notRun.length} not run.`,
   "",
   "| Scenario | Result | Note |",
   "| --- | --- | --- |",
   ...outcomes.map(({ name, passed: result, error }) =>
     `| ${name} | ${result ? "PASS" : "FAIL"} | ${error ?? ""} |`
   ),
+  ...notRun.map(({ name, note }) => `| ${name} | NOT RUN | ${note} |`),
   ""
 ].join("\n");
 await writeFile(path.join(root, "reports", "firefox-enhancements.md"), report);
 console.log(report);
-if (passed !== outcomes.length) process.exitCode = 1;
+if (passed !== outcomes.length || notRun.length) process.exitCode = 1;
