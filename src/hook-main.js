@@ -381,15 +381,6 @@ import { classify } from "./classifier.js";
       }
       if (!state.frameDiscoveryInstalled) {
         state.frameDiscoveryInstalled = true;
-        for (const method of ["appendChild", "insertBefore"]) {
-          patch(win.Node.prototype, method, (original) => {
-            return function frameDiscoveryHook(node) {
-              const result = Reflect.apply(original, this, arguments);
-              scanFrames(node);
-              return result;
-            };
-          });
-        }
       }
       state.frameObserver?.disconnect();
       state.frameObserver = new win.MutationObserver((records) => {
